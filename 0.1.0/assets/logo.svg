@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0" y="0" width="256" height="256" viewBox="0, 0, 256, 256">
+  <g id="Background">
+    <rect x="0" y="0" width="256" height="256" fill="#000000" fill-opacity="0"/>
+  </g>
+  <g id="Main">
+    <g id="Tabular">
+      <g id="TR">
+        <g id="Side">
+          <path d="M98.505,1.5 L128.164,1.5 L34.196,113.953 L76.342,206.355 L46.683,206.355 L4.537,113.953 L98.505,1.5 z" fill="#CACCFA"/>
+          <path d="M98.505,1.5 L128.164,1.5 L34.196,113.953 L76.342,206.355 L46.683,206.355 L4.537,113.953 L98.505,1.5 z" fill-opacity="0" stroke="#FFFFFF" stroke-width="1"/>
+        </g>
+        <g id="Face">
+          <path d="M34.196,113.953 L128.164,1.5 L170.309,93.902 L76.342,206.355 L34.196,113.953 z" fill="#6369FA"/>
+          <path d="M34.196,113.953 L128.164,1.5 L170.309,93.902 L76.342,206.355 L34.196,113.953 z" fill-opacity="0" stroke="#FFFFFF" stroke-width="1"/>
+        </g>
+      </g>
+      <g id="BL">
+        <g id="Side">
+          <path d="M99.505,50.645 L129.164,50.645 L35.197,163.098 L77.342,255.5 L47.683,255.5 L5.538,163.098 L99.505,50.645 z" fill="#CACCFA"/>
+          <path d="M99.505,50.645 L129.164,50.645 L35.197,163.098 L77.342,255.5 L47.683,255.5 L5.538,163.098 L99.505,50.645 z" fill-opacity="0" stroke="#FFFFFF" stroke-width="1"/>
+        </g>
+        <g id="Face">
+          <path d="M35.197,163.098 L129.164,50.645 L171.31,143.047 L77.342,255.5 L35.197,163.098 z" fill="#6369FA"/>
+          <path d="M35.197,163.098 L129.164,50.645 L171.31,143.047 L77.342,255.5 L35.197,163.098 z" fill-opacity="0" stroke="#FFFFFF" stroke-width="1"/>
+        </g>
+      </g>
+      <g id="TR">
+        <g id="Side">
+          <path d="M180.658,1.5 L210.317,1.5 L116.35,113.953 L158.495,206.355 L128.836,206.355 L86.691,113.953 L180.658,1.5 z" fill="#CACCFA"/>
+          <path d="M180.658,1.5 L210.317,1.5 L116.35,113.953 L158.495,206.355 L128.836,206.355 L86.691,113.953 L180.658,1.5 z" fill-opacity="0" stroke="#FFFFFF" stroke-width="1"/>
+        </g>
+        <g id="Face">
+          <path d="M116.35,113.953 L210.317,1.5 L252.463,93.902 L158.495,206.355 L116.35,113.953 z" fill="#6369FA"/>
+          <path d="M116.35,113.953 L210.317,1.5 L252.463,93.902 L158.495,206.355 L116.35,113.953 z" fill-opacity="0" stroke="#FFFFFF" stroke-width="1"/>
+        </g>
+      </g>
+      <g id="BR">
+        <g id="Side">
+          <path d="M178.773,50.645 L208.432,50.645 L114.464,163.098 L156.61,255.5 L126.951,255.5 L84.805,163.098 L178.773,50.645 z" fill="#CACCFA"/>
+          <path d="M178.773,50.645 L208.432,50.645 L114.464,163.098 L156.61,255.5 L126.951,255.5 L84.805,163.098 L178.773,50.645 z" fill-opacity="0" stroke="#FFFFFF" stroke-width="1"/>
+        </g>
+        <g id="Face">
+          <path d="M114.464,163.098 L208.432,50.645 L250.577,143.047 L156.61,255.5 L114.464,163.098 z" fill="#6369FA"/>
+          <path d="M114.464,163.098 L208.432,50.645 L250.577,143.047 L156.61,255.5 L114.464,163.098 z" fill-opacity="0" stroke="#FFFFFF" stroke-width="1"/>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>
