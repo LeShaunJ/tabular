@@ -1,0 +1,8 @@
+mkdocs-material
+mkdocstrings-crystal
+mkdocs-gen-files
+mkdocs-literate-nav
+mkdocs-section-index
+pymdown-extensions
+markdown-callouts
+mike

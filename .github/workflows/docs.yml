@@ -1,0 +1,53 @@
+name: Docs
+
+on:
+  push:
+    branches-ignore:
+      - "**"
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+
+jobs:
+  build-and-deploy:
+    concurrency: ci-${{ github.ref }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+      pages: write
+    steps:
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v5
+
+      - name: Install Crystal
+        uses: crystal-lang/install-crystal@v1
+
+      - name: Download source
+        uses: actions/checkout@v5
+
+      - name: Setup credentials
+        uses: oleksiyrudenko/gha-git-credentials@v2-latest
+        with:
+          token: '${{ secrets.PAT_TABULAR }}'
+
+      - name: Install dependencies
+        run: shards install
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+
+      - name: Install requirements
+        run: pip install -r docs/requirements.txt
+
+      - name: Upload
+        run: |
+          VERSION=$(echo $GITHUB_REF | cut -d / -f 3 | sed 's/v//')
+          echo $VERSION
+          git config pull.rebase true
+          git fetch origin
+          git pull origin gh-pages
+          mike set-default $VERSION
+          mike deploy --push $VERSION latest
