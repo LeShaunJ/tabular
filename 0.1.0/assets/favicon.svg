@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0" y="0" width="246.38" height="256" viewBox="0, 0, 246.38, 256">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0" y="0" width="314.287" height="256" viewBox="0, 0, 314.287, 256">
   <g id="Main" transform="translate(0, -0)">
+    <path d="M314.287,0 L292.034,26.428 L266.326,26.428 L179.951,129.011 L240.046,256 L213.618,256 L153.523,129.011 L239.898,26.428 L214.19,26.428 L236.443,0 L314.287,0 z" fill="#FFFFFF" id="T"/>
     <g id="Insignia">
       <g id="TL">
         <path d="M120.974,1.891 L139.896,43.379 L127.258,58.503 L122.552,48.183 L94.785,48.183 L32.178,123.106 L27.766,113.434 L120.974,1.891 z" fill="#FFFFFF" id="Face" display="none"/>
