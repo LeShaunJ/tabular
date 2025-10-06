@@ -1,0 +1,21 @@
+name: tabular
+version: 0.1.0
+
+authors:
+  - Arian Johnson <i.am@ajohn.dev>
+
+homepage: https://leshaunj.github.io/tabular
+documentation: https://leshaunj.github.io/tabular
+repository: https://github.com/leshaunj/tabular
+
+description: |-
+  Provide tab-completion for your Crystal CLI.
+
+# crystal: '>= 1.17.1'
+
+development_dependencies:
+  spectator:
+    gitlab: arctic-fox/spectator
+    version: ~> 0.12.0
+
+license: MIT

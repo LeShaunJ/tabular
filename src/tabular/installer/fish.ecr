@@ -1,0 +1,191 @@
+# <%= shell %> completion for <%= program %> -*- shell-script -*-
+# See: https://github.com/spf13/cobra/raw/refs/heads/main/<%= shell %>_completions.go
+<%- unless alternate.empty? %>
+alias <%= program %> '<%= alternate %>'
+<% end -%>
+
+function __<%= var_name %>_debug
+	set -l file "$TABULAR_LOG_FILE"
+	if test -n "$file"
+		echo "$argv" >> $file
+	end
+end
+
+function __<%= var_name %>_perform_completion
+	__<%= var_name %>_debug "Starting __<%= var_name %>_perform_completion"
+
+	set -l args (commandline -opc)
+	set -l lastArg (string escape -- (commandline -ct))
+
+	__<%= var_name %>_debug "args: $args"
+	__<%= var_name %>_debug "last arg: $lastArg"
+
+	set -l requestComp "<%= active_help_name %>=0 $args[1] <%= command %> $args[2..-1] $lastArg"
+
+	__<%= var_name %>_debug "Calling $requestComp"
+	set -l results (eval $requestComp 2> /dev/null)
+
+	for line in $results[-1..1]
+		if test (string trim -- $line) = ""
+			set results $results[1..-2]
+		else
+			break
+		end
+	end
+
+	set -l comps $results[1..-2]
+	set -l directiveLine $results[-1]
+
+	set -l flagPrefix (string match -r -- '-.*=' "$lastArg")
+
+	__<%= var_name %>_debug "Comps: $comps"
+	__<%= var_name %>_debug "DirectiveLine: $directiveLine"
+	__<%= var_name %>_debug "flagPrefix: $flagPrefix"
+
+	for comp in $comps
+		printf "%s%s\n" "$flagPrefix" "$comp"
+	end
+
+	printf "%s\n" "$directiveLine"
+end
+
+function __<%= var_name %>_perform_completion_once
+	__<%= var_name %>_debug "Starting __<%= var_name %>_perform_completion_once"
+
+	if test -n "$__<%= var_name %>_perform_completion_once_result"
+		__<%= var_name %>_debug "Seems like a valid result already exists, skipping __<%= var_name %>_perform_completion"
+		return 0
+	end
+
+	set --global __<%= var_name %>_perform_completion_once_result (__<%= var_name %>_perform_completion)
+	if test -z "$__<%= var_name %>_perform_completion_once_result"
+		__<%= var_name %>_debug "No completions, probably due to a failure"
+		return 1
+	end
+
+	__<%= var_name %>_debug "Performed completions and set __<%= var_name %>_perform_completion_once_result"
+	return 0
+end
+
+function __<%= var_name %>_clear_perform_completion_once_result
+	__<%= var_name %>_debug ""
+	__<%= var_name %>_debug "========= clearing previously set __<%= var_name %>_perform_completion_once_result variable =========="
+	set --erase __<%= var_name %>_perform_completion_once_result
+	__<%= var_name %>_debug "Successfully erased the variable __<%= var_name %>_perform_completion_once_result"
+end
+
+function __<%= var_name %>_requires_order_preservation
+	__<%= var_name %>_debug ""
+	__<%= var_name %>_debug "========= checking if order preservation is required =========="
+
+	__<%= var_name %>_perform_completion_once
+	if test -z "$__<%= var_name %>_perform_completion_once_result"
+		__<%= var_name %>_debug "Error determining if order preservation is required"
+		return 1
+	end
+
+	set -l directive (string sub --start 2 $__<%= var_name %>_perform_completion_once_result[-1])
+	__<%= var_name %>_debug "Directive is: $directive"
+
+	set -l shellCompDirectiveKeepOrder <%= Directive::KeepOrder.value %>
+	set -l keeporder (math (math --scale 0 $directive / $shellCompDirectiveKeepOrder) % 2)
+	__<%= var_name %>_debug "Keeporder is: $keeporder"
+
+	if test $keeporder -ne 0
+		__<%= var_name %>_debug "This does require order preservation"
+		return 0
+	end
+
+	__<%= var_name %>_debug "This doesn't require order preservation"
+	return 1
+end
+
+
+function __<%= var_name %>_prepare_completions
+	__<%= var_name %>_debug ""
+	__<%= var_name %>_debug "========= starting completion logic =========="
+
+	set --erase __<%= var_name %>_comp_results
+
+	__<%= var_name %>_perform_completion_once
+	__<%= var_name %>_debug "Completion results: $__<%= var_name %>_perform_completion_once_result"
+
+	if test -z "$__<%= var_name %>_perform_completion_once_result"
+		__<%= var_name %>_debug "No completion, probably due to a failure"
+		return 1
+	end
+
+	set -l directive (string sub --start 2 $__<%= var_name %>_perform_completion_once_result[-1])
+	set --global __<%= var_name %>_comp_results $__<%= var_name %>_perform_completion_once_result[1..-2]
+
+	__<%= var_name %>_debug "Completions are: $__<%= var_name %>_comp_results"
+	__<%= var_name %>_debug "Directive is: $directive"
+
+	set -l shellCompDirectiveError <%= Directive::Error.value %>
+	set -l shellCompDirectiveNoSpace <%= Directive::NoSpace.value %>
+	set -l shellCompDirectiveNoFileComp <%= Directive::NoFile.value %>
+	set -l shellCompDirectiveFilterFileExt <%= Directive::FilterExt.value %>
+	set -l shellCompDirectiveFilterDirs <%= Directive::FilterDir.value %>
+
+	if test -z "$directive"
+		set directive 0
+	end
+
+	set -l compErr (math (math --scale 0 $directive / $shellCompDirectiveError) % 2)
+	if test $compErr -eq 1
+		__<%= var_name %>_debug "Received error directive: aborting."
+		return 1
+	end
+
+	set -l filefilter (math (math --scale 0 $directive / $shellCompDirectiveFilterFileExt) % 2)
+	set -l dirfilter (math (math --scale 0 $directive / $shellCompDirectiveFilterDirs) % 2)
+	if test $filefilter -eq 1; or test $dirfilter -eq 1
+		__<%= var_name %>_debug "File extension filtering or directory filtering not supported"
+		return 1
+	end
+
+	set -l nospace (math (math --scale 0 $directive / $shellCompDirectiveNoSpace) % 2)
+	set -l nofiles (math (math --scale 0 $directive / $shellCompDirectiveNoFileComp) % 2)
+
+	__<%= var_name %>_debug "nospace: $nospace, nofiles: $nofiles"
+
+	if test $nospace -ne 0; or test $nofiles -eq 0
+		set -l prefix (commandline -t | string escape --style=regex)
+		__<%= var_name %>_debug "prefix: $prefix"
+
+		set -l completions (string match -r -- "^$prefix.*" $__<%= var_name %>_comp_results)
+		set --global __<%= var_name %>_comp_results $completions
+		__<%= var_name %>_debug "Filtered completions are: $__<%= var_name %>_comp_results"
+
+		set -l numComps (count $__<%= var_name %>_comp_results)
+		__<%= var_name %>_debug "numComps: $numComps"
+
+		if test $numComps -eq 1; and test $nospace -ne 0
+			set -l split (string split --max 1 \t $__<%= var_name %>_comp_results[1])
+
+			set -l lastChar (string sub -s -1 -- $split)
+			if not string match -r -q "[@=/:.,]" -- "$lastChar"
+				__<%= var_name %>_debug "Adding second completion to perform nospace directive"
+				set --global __<%= var_name %>_comp_results $split[1] $split[1].
+				__<%= var_name %>_debug "Completions are now: $__<%= var_name %>_comp_results"
+			end
+		end
+
+		if test $numComps -eq 0; and test $nofiles -eq 0
+			__<%= var_name %>_debug "Requesting file completion"
+			return 1
+		end
+	end
+
+	return 0
+end
+
+if type -q "<%= program %>"
+	complete --do-complete "<%= program %> " > /dev/null 2>&1
+end
+
+complete -c <%= program %> -e
+
+complete -c <%= program %> -n '__<%= var_name %>_clear_perform_completion_once_result'
+complete -c <%= program %> -n 'not __<%= var_name %>_requires_order_preservation && __<%= var_name %>_prepare_completions' -f -a '$__<%= var_name %>_comp_results'
+complete -k -c <%= program %> -n '__<%= var_name %>_requires_order_preservation && __<%= var_name %>_prepare_completions' -f -a '$__<%= var_name %>_comp_results'
