@@ -11,7 +11,7 @@ repository: https://github.com/leshaunj/tabular
 description: |-
   Provide tab-completion for your Crystal CLI.
 
-# crystal: '>= 1.17.1'
+crystal: '>= 1.15.0'
 
 development_dependencies:
   spectator:
