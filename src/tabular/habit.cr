@@ -8,6 +8,9 @@ module Tabular(T)
     @replier : Replier = ->(t : Tablet) { true }
     @words : Array(String) = [] of String
 
+    # :showdoc:
+    # The current set of command-lne arguments in the completion process.
+    private getter :words
     protected getter :tablets
 
     protected def initialize
