@@ -31,7 +31,8 @@ module Tabular(T)
     end
   end
 
-  private alias Directable = Directive | Int32
+  # Any value that can be used to create a [`Directive`][Tabular::Directive].
+  alias Directable = Directive | Int32 | Symbol
 
   # Specifiers that determine the functionality of a [`Tablet`][Tabular::Tablet].
   enum Kind
