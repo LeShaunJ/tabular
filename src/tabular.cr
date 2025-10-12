@@ -2,6 +2,8 @@ require "./tabular/*"
 
 # The `Tabular` library.
 module Tabular(T)
+  extend self
+
   # Define the set of [`Tablets`][Tabular::Tablets] and an optional [`Habit#dispatch`][Tabular::Habit#dispatch]
   # and process the given *words* sent from the command-line:
     #
@@ -26,7 +28,7 @@ module Tabular(T)
     #   end
     # end
     # ```
-  def self.form(words : Array(String) = ARGV) : Bool
+  def form(words : Array(String) = ARGV) : Bool
     Tabular::Habit.new.form words do |formation|
       with formation yield
     end
