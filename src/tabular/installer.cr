@@ -30,7 +30,7 @@ module Tabular(T)
 
   # Return `true` and shift, if the first element in *args* is the *prompt*. to install a completion script.
   def self.install?(arg = ARGV, *, prompt = "completion")
-    return false unless args[0]? == self.prompt
+    return false unless args[0]? == prompt
 
     args.shift
     true
