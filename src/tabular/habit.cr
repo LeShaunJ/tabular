@@ -105,7 +105,7 @@ module Tabular(T)
       # - *choices*: A set of possible values for the argument. If `empty?`, any value is accepted.
       # - *help*: See [`Tablet#help`][Tabular::Tablet#help].
       # - *directives*: See [`Directive`][Tabular::Directive].
-    def argument(choices : Array(String), help = "", directives : Directable? = nil)
+    def argument(choices : Array(String), help : String = "", directives : Directable? = nil)
       self << Tablet.new :argument, "", choices, help, directives: directives
     end
 
@@ -115,7 +115,7 @@ module Tabular(T)
       # - *aliases*: See [`Tablet#aliases`][Tabular::Tablet#aliases].
       # - *help*: See [`Tablet#help`][Tabular::Tablet#help].
       # - *directives*: See [`Directive`][Tabular::Directive].
-    def command(name : String, aliases = [] of String, help = "", directives : Directable? = nil)
+    def command(name : String, aliases : Array(String) = [] of String, help = "", directives : Directable? = nil)
       self << Tablet.new :command, name, aliases, help, directives
     end
 
@@ -144,7 +144,7 @@ module Tabular(T)
       # - *aliases*: See [`Tablet#aliases`][Tabular::Tablet#aliases].
       # - *help*: See [`Tablet#help`][Tabular::Tablet#help].
       # - *directives*: See [`Directive`][Tabular::Directive].
-    def command(name : String, aliases = [] of String, help = "", directives : Directable? = nil, &)
+    def command(name : String, aliases : Array(String) = [] of String, help = "", directives : Directable? = nil, &)
       tablet = command(name, aliases, help, directives)
       with tablet.habit yield
       tablet
@@ -214,8 +214,8 @@ module Tabular(T)
       tablets = current.habit.tablets if current.form?
 
       tablets.each do |tablet|
-        tablet.candidate words[0] do |reply|
-          Log.out reply
+        tablet.candidate words[0] do |suggestion|
+          Log.out suggestion
         end
       end
 
@@ -227,9 +227,7 @@ module Tabular(T)
     end
 
     protected def self.find(tablets : Tablets, word : String)
-      result = tablets.find { |t| t.match?(word) }
-
-      result.nil? ? Tablet::NONE : result
+      tablets.find &.match?(word) || Tablet::NONE
     end
 
     protected def self.traverse(tablets : Tablets, words : Array(String), & : Tablet -> Bool) : Tablet
