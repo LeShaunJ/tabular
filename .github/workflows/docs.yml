@@ -50,4 +50,4 @@ jobs:
           git fetch origin
           git pull origin gh-pages
           mike set-default $VERSION
-          mike deploy --push $VERSION latest
+          mike deploy --push $VERSION latest -u

@@ -41,6 +41,8 @@ theme:
     - toc.follow
     - content.code.copy
     - content.code.select
+    - search.suggest
+    - search.highlight
 
 site_description: "Provide `go-cobra`-style tab-completions for your Crystal CLI."
 site_author: Arian LeShaun Johnson
@@ -61,9 +63,10 @@ extra:
 extra_css:
   - css/mkdocstrings.css
 
+use_directory_urls: false
+
 plugins:
-  - search:
-      indexing: full
+  - search
   - gen-files:
       scripts:
         - docs/js/stubs.py
@@ -71,7 +74,11 @@ plugins:
       default_handler: crystal
   - literate-nav:
       nav_file: summary.md
+      markdown_extensions:
+        - mdx_truly_sane_lists
   - section-index
+  - mike:
+      canonical_version: latest
 
 markdown_extensions:
   - admonition
@@ -79,6 +86,7 @@ markdown_extensions:
   - github-callouts
   - deduplicate-toc
   - def_list
+  - mdx_truly_sane_lists
   - pymdownx.betterem:
       smart_enable: all
   - pymdownx.caret

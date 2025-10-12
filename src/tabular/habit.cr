@@ -210,7 +210,20 @@ module Tabular(T)
       tablet :none, "#{words.join("\n")}#{EOR}", directives: :relay
     end
 
-    # Yield control back to the CLI when a [`Command`][Tabular::Kind::Command] is matched.
+    # Yield control back to the CLI with *block* when a [`Command`][Tabular::Kind::Command] is matched:
+      #
+      # ```crystal
+      # if Tabular.prompt?
+      #   Tabular.form do
+      #     command "cmd1"
+      #     command "cmd2"
+      #
+      #     dispatch do |command|
+      #       # bespoke handling
+      #     end
+      #   end
+      # end
+      # ```
     def dispatch(&block : Tablet -> Bool)
       @replier = block
       return
