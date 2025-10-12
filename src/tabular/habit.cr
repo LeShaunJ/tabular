@@ -86,9 +86,7 @@ module Tabular(T)
       # - *delimiters*: Ad hoc delimiters that will override [`#delimiters`][Tabular::Habit#delimiters].
       # - *repeatable*: See [`Tablet#repeatable?`][Tabular::Tablet#repeatable?].
     def option(name : String, *aliases, help = "", delimiters = Tabular.delimiters, repeatable = false, &)
-      tablet = option(name, *aliases, help, delimiters: delimiters, repeatable: repeatable)
-      with tablet.habit yield
-      tablet
+      with_habit option(name, *aliases, help, delimiters: delimiters, repeatable: repeatable)
     end
 
     # Create a [`Argument`][Tabular::Kind::Argument]-flavoured [`Tablet`][Tabular::Tablet].
@@ -145,9 +143,7 @@ module Tabular(T)
       # - *help*: See [`Tablet#help`][Tabular::Tablet#help].
       # - *directives*: See [`Directive`][Tabular::Directive].
     def command(name : String, aliases : Array(String) = [] of String, help = "", directives : Directable? = nil, &)
-      tablet = command(name, aliases, help, directives)
-      with tablet.habit yield
-      tablet
+      with_habit command(name, aliases, help, directives)
     end
 
     # Create a [`Tablet`][Tabular::Tablet] for the [`Command`][Tabular::Kind::Command] that installs
@@ -256,6 +252,11 @@ module Tabular(T)
 
     protected def self.directives(tablets : Tablets)
       tablets.reduce(Directive::None) { |a, t| a | t.directives }
+    end
+
+    private macro with_habit(tablet)
+      with (tablet = {{tablet}}).habit yield
+      tablet
     end
   end
 end
