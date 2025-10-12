@@ -193,6 +193,23 @@ module Tabular(T)
       self << Tablet.new kind, *args, **kwargs
     end
 
+    # Create a [`Command`][Tabular::Kind::Command] that yield completions for *words* back to the shell:
+      #
+      # ```crystal
+      # if Tabular.prompt?
+      #   Tabular.form do
+      #     relay
+      #   end
+      # end
+      # ```
+      #
+      # Completions from the point of this [`Tablet`][Tabular::Tablet] are generated as if the
+      # command-line started with the remaining [`#words`][Tabular::Habit#words]. This is useful
+      # for `sudo`-like commands that expect a command prompt to run in a specific context.
+    def relay(words : Array(String) = @words)
+      tablet :none, "#{words.join("\n")}#{EOR}", directives: :relay
+    end
+
     # Yield control back to the CLI when a [`Command`][Tabular::Kind::Command] is matched.
     def dispatch(&block : Tablet -> Bool)
       @replier = block

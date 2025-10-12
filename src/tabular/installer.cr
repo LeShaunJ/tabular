@@ -9,6 +9,8 @@ module Tabular(T)
   INSTALLER_PATH = "#{__DIR__}/installer"
   # :nodoc:
   SHELLS = {"bash", "fish", "zsh"}
+  # :nodoc:
+  EOR = "::"
 
   # Return the name of the CLI argument that will prompt completions.
   def self.prompt : String

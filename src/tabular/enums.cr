@@ -17,6 +17,8 @@ module Tabular(T)
     FilterDir
     # Indicates that the shell should preserve the order in which the completions are provided
     KeepOrder
+    # Indicates that the shell should suggest—and/or provide completions for—executables from henceforth.
+    Relay
 
     # Returns the `String` representation that will be sent to the shell.
     def show; ":#{value}"; end

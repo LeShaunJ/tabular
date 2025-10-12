@@ -124,7 +124,8 @@ function __<%= var_name %>_prepare_completions
 	set -l shellCompDirectiveNoSpace <%= Directive::NoSpace.value %>
 	set -l shellCompDirectiveNoFileComp <%= Directive::NoFile.value %>
 	set -l shellCompDirectiveFilterFileExt <%= Directive::FilterExt.value %>
-	set -l shellCompDirectiveFilterDirs <%= Directive::FilterDir.value %>
+	set -l shellCompDirectiveFilterDir <%= Directive::FilterDir.value %>
+	set -l shellCompDirectiveRelay <%= Directive::Relay.value %>
 
 	if test -z "$directive"
 		set directive 0
@@ -136,8 +137,18 @@ function __<%= var_name %>_prepare_completions
 		return 1
 	end
 
+	set -l relay (math (math --scale 0 $directive / $shellCompDirectiveRelay) % 2)
+	if test $relay -eq 1
+		__<%= var_name %>_debug "Relaying completions"
+		set --global words $__<%= var_name %>_comp_results[1..-2]
+		set --global words $words $(string trim --right --char '<%= EOR %>' $__<%= var_name %>_comp_results[-1])
+		__<%= var_name %>_debug "\$words[$(count $words)]=($words)"
+		set --global __<%= var_name %>_comp_results (complete -C "$words")
+		return 0
+	end
+
 	set -l filefilter (math (math --scale 0 $directive / $shellCompDirectiveFilterFileExt) % 2)
-	set -l dirfilter (math (math --scale 0 $directive / $shellCompDirectiveFilterDirs) % 2)
+	set -l dirfilter (math (math --scale 0 $directive / $shellCompDirectiveFilterDir) % 2)
 	if test $filefilter -eq 1; or test $dirfilter -eq 1
 		__<%= var_name %>_debug "File extension filtering or directory filtering not supported"
 		return 1

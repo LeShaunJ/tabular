@@ -69,9 +69,10 @@ module Tabular(T)
     # Yield suggestions for any names that contain *word*.
     def candidate(word : String, & : String -> )
       return if skip?(word)
+      return @aliases.each { |a| yield show(a) } if always_suggest?
 
       @aliases.each do |a|
-        next unless passthru? || a.starts_with?(word)
+        next unless a.starts_with?(word)
 
         yield show(a)
       end
@@ -122,6 +123,10 @@ module Tabular(T)
       return false unless form?
 
       /^#{name}#{@delimiters}$/.matches?(word)
+    end
+
+    private def always_suggest?
+      @always_suggest ||= (directives.relay? || passthru?).as(Bool)
     end
 
     private def passthru?

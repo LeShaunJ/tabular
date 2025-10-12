@@ -21,6 +21,7 @@ _<%= var_name %>() {
 	local shellCompDirectiveFilterFileExt=<%= Directive::FilterExt.value %>
 	local shellCompDirectiveFilterDirs=<%= Directive::FilterDir.value %>
 	local shellCompDirectiveKeepOrder=<%= Directive::KeepOrder.value %>
+	local shellCompDirectiveRelay=<%= Directive::Relay.value %>
 
 	local lastParam lastChar flagPrefix requestComp out directive comp lastComp noSpace keepOrder
 	local -a completions
@@ -60,7 +61,7 @@ _<%= var_name %>() {
 	if [ "${lastLine[1]}" = : ]; then
 		directive=${lastLine[2,-1]}
 		local suffix
-		(( suffix=${#lastLine}+2))
+		(( suffix=${#lastLine}+2 ))
 		out=${out[1,-$suffix]}
 	else
 		__<%= var_name %>_debug "No directive found.  Setting do default"
@@ -71,8 +72,21 @@ _<%= var_name %>() {
 	__<%= var_name %>_debug "completions: ${out}"
 	__<%= var_name %>_debug "flagPrefix: ${flagPrefix}"
 
-	if [ $((directive & shellCompDirectiveError)) -ne 0 ]; then
+	if (( directive & shellCompDirectiveError )); then
 		__<%= var_name %>_debug "Completion received error. Ignoring completions."
+		return
+	fi
+
+	if (( directive & shellCompDirectiveRelay )); then
+		__<%= var_name %>_debug "Relaying completion..."
+		args=("${(@f)${out%%$'<%= EOR %>'}}")
+		if [ ${#args[@]} -gt 1 ]; then
+			words=(_ "${args[@]}")
+			_command
+		else
+			words=("${args[@]}")
+			_command_names
+		fi
 		return
 	fi
 
@@ -106,24 +120,24 @@ _<%= var_name %>() {
 	done < <(printf "%s\n" "${out[@]}")
 
 	if [ $hasActiveHelp -eq 1 ]; then
-		if [ ${#completions} -ne 0 ] || [ $((directive & shellCompDirectiveNoFileComp)) -eq 0 ]; then
+		if [ ${#completions} -ne 0 ] || (( directive & shellCompDirectiveNoFileComp )); then
 			__<%= var_name %>_debug "Adding activeHelp delimiter"
 			compadd -x "--"
 			hasActiveHelp=0
 		fi
 	fi
 
-	if [ $((directive & shellCompDirectiveNoSpace)) -ne 0 ]; then
+	if (( directive & shellCompDirectiveNoSpace )); then
 		__<%= var_name %>_debug "Activating nospace."
 		noSpace="-S ''"
 	fi
 
-	if [ $((directive & shellCompDirectiveKeepOrder)) -ne 0 ]; then
+	if (( directive & shellCompDirectiveKeepOrder )); then
 		__<%= var_name %>_debug "Activating keep order."
 		keepOrder="-V"
 	fi
 
-	if [ $((directive & shellCompDirectiveFilterFileExt)) -ne 0 ]; then
+	if (( directive & shellCompDirectiveFilterFileExt )); then
 		local filteringCmd
 		filteringCmd='_files'
 		for filter in ${completions[@]}; do
@@ -136,7 +150,7 @@ _<%= var_name %>() {
 
 		__<%= var_name %>_debug "File filtering command: $filteringCmd"
 		_arguments '*:filename:'"$filteringCmd"
-	elif [ $((directive & shellCompDirectiveFilterDirs)) -ne 0 ]; then
+	elif (( directive & shellCompDirectiveFilterDirs )); then
 		local subdir
 		subdir="${completions[1]}"
 		if [ -n "$subdir" ]; then
