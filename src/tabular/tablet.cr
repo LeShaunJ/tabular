@@ -66,30 +66,30 @@ module Tabular(T)
       @repeatable
     end
 
-    # Yield suggestions for any names that contain *arg*.
-    def candidate(arg : String, & : String -> )
-      return if skip?(arg)
+    # Yield suggestions for any names that contain *word*.
+    def candidate(word : String, & : String -> )
+      return if skip?(word)
 
       @aliases.each do |a|
-        next unless passthru? || a.starts_with?(arg)
+        next unless passthru? || a.starts_with?(word)
 
         yield show(a)
       end
     end
 
-    # Returns `self` if *arg* is an exact match of any names. Otherwise, raise [`Error::Match`][Tabular::Error::Match].
-    def match!(arg : String)
-      raise Error::Match.new "No match for '#{arg}'" unless match?(arg)
+    # Returns `self` if *word* is an exact match of any names. Otherwise, raise [`Error::Match`][Tabular::Error::Match].
+    def match!(word : String)
+      raise Error::Match.new "No match for '#{word}'" unless match?(word)
 
       self
     end
 
-    # Return `true` if *arg* is an exact match of any names.
-    def match?(arg : String) : Bool
+    # Return `true` if *word* is an exact match of any names.
+    def match?(word : String) : Bool
       return true if passthru? || @aliases.empty?
 
       @aliases.find_value(false) do |a|
-        delimited?(arg, a) || a == arg
+        delimited?(word, a) || a == word
       end
     end
 
@@ -113,15 +113,15 @@ module Tabular(T)
       io << show
     end
 
-    private def skip?(arg : String)
-      arg.empty? && kind.option?
+    private def skip?(word : String)
+      word.empty? && kind.option?
     end
 
-    private def delimited?(arg : String, name : String)
+    private def delimited?(word : String, name : String)
       return false if @delimiters.empty?
       return false unless form?
 
-      /^#{name}#{@delimiters}$/.matches?(arg)
+      /^#{name}#{@delimiters}$/.matches?(word)
     end
 
     private def passthru?

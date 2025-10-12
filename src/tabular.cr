@@ -26,8 +26,8 @@ module Tabular(T)
     #   end
     # end
     # ```
-  def self.form(args : Array(String) = ARGV) : Bool
-    Tabular::Habit.new.form args do |formation|
+  def self.form(words : Array(String) = ARGV) : Bool
+    Tabular::Habit.new.form words do |formation|
       with formation yield
     end
   end

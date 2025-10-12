@@ -6,7 +6,7 @@ module Tabular(T)
   class Habit
     @tablets : Tablets
     @replier : Replier = ->(t : Tablet) { true }
-    @args : Array(String) = [] of String
+    @words : Array(String) = [] of String
 
     protected getter :tablets
 
@@ -14,7 +14,7 @@ module Tabular(T)
       @tablets = Tablets.new
     end
 
-    protected def form(@args = ARGV) : Bool
+    protected def form(@words = ARGV) : Bool
       with self yield self
 
       reply
@@ -197,24 +197,24 @@ module Tabular(T)
       @tablets.size
     end
 
-    protected def reply(args = @args) : Bool
-      return true if args.empty?
+    protected def reply(words = @words) : Bool
+      return true if words.empty?
 
       tablets = @tablets
-      current = Habit.traverse(tablets, args) do |runnable|
+      current = Habit.traverse(tablets, words) do |runnable|
         Log::Debug.show "RUN: #{runnable}"
 
-        return runnable.habit.reply args if runnable.form?
+        return runnable.habit.reply words if runnable.form?
 
         return @replier.call runnable
       end
 
-      delimit_override = Habit.find(tablets, args[0])
+      delimit_override = Habit.find(tablets, words[0])
       current = delimit_override unless delimit_override.kind.none?
       tablets = current.habit.tablets if current.form?
 
       tablets.each do |tablet|
-        tablet.candidate args[0] do |reply|
+        tablet.candidate words[0] do |reply|
           Log.out reply
         end
       end
@@ -226,24 +226,24 @@ module Tabular(T)
       false
     end
 
-    protected def self.find(tablets : Tablets, arg : String)
-      result = tablets.find { |t| t.match?(arg) }
+    protected def self.find(tablets : Tablets, word : String)
+      result = tablets.find { |t| t.match?(word) }
 
       result.nil? ? Tablet::NONE : result
     end
 
-    protected def self.traverse(tablets : Tablets, args : Array(String), & : Tablet -> Bool) : Tablet
+    protected def self.traverse(tablets : Tablets, words : Array(String), & : Tablet -> Bool) : Tablet
       current = Tablet::NONE
 
-      while args.size > 1
-        arg = args.shift
-        Tabular::Log::Debug.show "ARG: #{arg} | LEFT: #{args}"
+      while words.size > 1
+        word = words.shift
+        Tabular::Log::Debug.show "ARG: '#{word}' | LEFT: #{words} (#{words.object_id})"
 
         next if current.next do |a|
-          current = Tablet::NONE if a.match!(arg)
+          current = Tablet::NONE if a.match!(word)
         end
 
-        current = find(tablets, arg)
+        current = find(tablets, word)
         next if current.kind.none?
 
         tablets.delete current unless current.repeatable?
