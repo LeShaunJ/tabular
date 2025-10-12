@@ -1,5 +1,5 @@
 module Tabular(T)
-  alias Replier = Tablet -> Bool
+  private alias Replier = Tablet -> Bool
 
   # A class that manages the [formation](https://en.wikipedia.org/wiki/Crystal_habit) of
   # a set of [`Tablets`][Tabular::Tablets] within the `block` of [`Tabular.form`][Tabular.form].
@@ -183,7 +183,7 @@ module Tabular(T)
     end
 
     # Yield control back to the CLI when a [`Command`][Tabular::Kind::Command] is matched.
-    def dispatch(&block : Replier)
+    def dispatch(&block : Tablet -> Bool)
       @replier = block
       return
     end
