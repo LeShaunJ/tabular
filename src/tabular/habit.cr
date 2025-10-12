@@ -116,6 +116,10 @@ module Tabular(T)
     def command(name : String, aliases : Array(String) = [] of String, help = "", directives : Directable? = nil)
       self << Tablet.new :command, name, aliases, help, directives
     end
+    # :ditto:
+    def command(name : String, *aliases, help = "", directives : Tabular::Directable? = nil)
+      command name, [ *aliases ] of String, help, directives
+    end
 
     # Create a [`Command`][Tabular::Kind::Command]-flavoured [`Tablet`][Tabular::Tablet] along with
     # its nested formation:
@@ -144,6 +148,10 @@ module Tabular(T)
       # - *directives*: See [`Directive`][Tabular::Directive].
     def command(name : String, aliases : Array(String) = [] of String, help = "", directives : Directable? = nil, &)
       with_habit command(name, aliases, help, directives)
+    end
+    # :ditto:
+    def command(name : String, *aliases, help = "", directives : Tabular::Directable? = nil, &)
+      with_habit command(name, [ *aliases ] of String, help, directives)
     end
 
     # Create a [`Tablet`][Tabular::Tablet] for the [`Command`][Tabular::Kind::Command] that installs
