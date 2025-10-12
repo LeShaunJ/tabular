@@ -33,4 +33,35 @@ module Tabular(T)
       with formation yield
     end
   end
+
+  # Define a completer as an instance method, *name*, with *&block* as the [`form`][Tabular.form]:
+    #
+    # ```crystal
+    # class MyClass
+    #   Tabular.define my_completer do
+    #     option "--help"
+    #     command "sub_cmd1"
+    #     command "sub_cmd2"
+    #   end
+    # end
+    # ```
+    # This is equivalent to:
+    # ```crystal
+    # class MyClass
+    #   def my_completer(words : String) : Bool
+    #     Tabular.form words do
+    #       option "--help"
+    #       command "sub_cmd1"
+    #       command "sub_cmd2"
+    #     end
+    #   end
+    # end
+    # ```
+  macro define(name, &block)
+    def {{name}}(words : Array(String) = ARGV) : Bool
+      Tabular.form words do
+        {{block.body}}
+      end
+    end
+  end
 end
