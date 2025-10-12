@@ -7,17 +7,16 @@ module Tabular(T)
 
   # Specify the global string of characters that may delimit a [`Option`][Tabular::Kind::Option]-flavour
   # [`Tablet`][Tabular::Tablet].
-  #
-  # ```crystal
-  # # Allows for something like `--option=`
-  # Tabular.delimiters = "="
-  # # Allows for something like `-option:`
-  # Tabular.delimiters = ":"
-  # # Allows for all of the above
-  # Tabular.delimiters = ":="
-  # ```
+    #
+    # ```crystal
+    # # Allows for something like `--option=`
+    # Tabular.delimiters = "="
+    # # Allows for something like `-option:`
+    # Tabular.delimiters = ":"
+    # # Allows for all of the above
+    # Tabular.delimiters = ":="
+    # ```
   protected def self.delimiters=(value : String)
-    Log::Debug.show "REZMERE"
     @@delimiters = value
   end
 
@@ -46,13 +45,13 @@ module Tabular(T)
     protected getter :habit
 
     # Create a new [`Tablet`][Tabular::Tablet].
-    #
-    # - *kind*: See [`#kind`][Tabular::Tablet#kind].
-    # - *name*: See [`#name`][Tabular::Tablet#name].
-    # - *aliases*: See [`#aliases`][Tabular::Tablet#aliases].
-    # - *help*: See [`#help`][Tabular::Tablet#help].
-    # - *directives*: See [`#directives`][Tabular::Tablet#directives].
-    # - *delimiters*: Ad hoc delimiters that will override [`Tabular.delimiters`][Tabular.delimiters].
+      #
+      # - *kind*: See [`#kind`][Tabular::Tablet#kind].
+      # - *name*: See [`#name`][Tabular::Tablet#name].
+      # - *aliases*: See [`#aliases`][Tabular::Tablet#aliases].
+      # - *help*: See [`#help`][Tabular::Tablet#help].
+      # - *directives*: See [`#directives`][Tabular::Tablet#directives].
+      # - *delimiters*: Ad hoc delimiters that will override [`Habit#delimiters`][Tabular::Habit#delimiters].
     def initialize(kind : Kind, @name = "", aliases = [] of String, help = "", directives : Directable? = nil, delimiters = Tabular.delimiters, @repeatable = false)
       @kind = Kind.from_value(kind)
       @aliases = [name].concat(aliases).reject(&.empty?).to_set

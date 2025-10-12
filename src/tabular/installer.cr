@@ -20,7 +20,7 @@ module Tabular(T)
     @@prompt = value
   end
 
-  # Retrun `true` and shift, if the first element in *args* is the [`Tabular.prompt`][Tabular.prompt].
+  # Return `true` and shift, if the first element in *args* is the [`Tabular.prompt`][Tabular.prompt].
   def self.prompt?(args = ARGV)
     return false unless args[0]? == self.prompt
 
@@ -28,7 +28,7 @@ module Tabular(T)
     true
   end
 
-  # Retrun `true` and shift, if the first element in *args* i the *prompt*. to install a completion script.
+  # Return `true` and shift, if the first element in *args* is the *prompt*. to install a completion script.
   def self.install?(arg = ARGV, *, prompt = "completion")
     return false unless args[0]? == self.prompt
 
@@ -37,17 +37,17 @@ module Tabular(T)
   end
 
   # Sends a completion script for the `<shell>` specified in *args*.
-  #
-  # - *args*: A list of user-specified arguments for the installer.
-  # - - `<shell>`: The shell to install the completions for (_supports: `bash`, `fish`, `zsh`_).
-  # - - `--development <path>`: An alternate path to alias the CLI name to.
-  # - *program*: The name of the CLI program. Best not to set this one.
-  # - *command*: The subcommand the completion script will call to get completions.
-  #
-  # Raises:
-  #
-  # - [`Error::Argument`][Tabular::Error::Argument] — For malformed CLI arguments.
-  # - [`Error::Support`][Tabular::Error::Support] — If shell is unsupported.
+    #
+    # - *args*: A list of user-specified arguments for the installer.
+    # - - `<shell>`: The shell to install the completions for (_supports: `bash`, `fish`, `zsh`_).
+    # - - `--development <path>`: An alternate path to alias the CLI name to.
+    # - *program*: The name of the CLI program. Best not to set this one.
+    # - *command*: The subcommand the completion script will call to get completions.
+    #
+    # Raises:
+    #
+    # - [`Error::Argument`][Tabular::Error::Argument] — For malformed CLI arguments.
+    # - [`Error::Support`][Tabular::Error::Support] — If shell is unsupported.
   def self.install!(args = ARGV, *, program : String = PROGRAM_NAME, command = Tabular.prompt)
     program = Path.new(program).basename
     var_name = program.gsub(/[:-]/, "_")

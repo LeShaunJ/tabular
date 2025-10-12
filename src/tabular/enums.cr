@@ -40,9 +40,9 @@ module Tabular(T)
     None
     # Specifies that a [`Tablet`][Tabular::Tablet] represents an [`#option`][Tabular::Habit#option] parameter.
     Option
-    # Specifies that a [`Tablet`][Tabular::Tablet] represents an [`argument`][Tabular::Habit#argument] parameter.
+    # Specifies that a [`Tablet`][Tabular::Tablet] represents an [`#argument`][Tabular::Habit#argument] parameter.
     Argument
-    # Specifies that a [`Tablet`][Tabular::Tablet] represents an [`subcommand`][Tabular::Habit#subcommand] parameter.
+    # Specifies that a [`Tablet`][Tabular::Tablet] represents an [`#command`][Tabular::Habit#command] parameter.
     Command
 
     # Returns `true` if the [`Tablet`][Tabular::Tablet] represented by the [`Kind`][Tabular::Kind] should hand control back to
@@ -52,9 +52,9 @@ module Tabular(T)
     end
 
     # Returns the default [`Directive`][Tabular::Directive] of the [`Kind`][Tabular::Kind].
-    #
-    # - [`Argument`][Tabular::Kind::Argument] — [`None`][Tabular::Directive::None]
-    # - All others — [`NoFile`][Tabular::Directive::NoFile]
+      #
+      # - [`Argument`][Tabular::Kind::Argument] — [`None`][Tabular::Directive::None]
+      # - All others — [`NoFile`][Tabular::Directive::NoFile]
     def directives
       case self
       when Kind::Argument then
