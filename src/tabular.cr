@@ -64,4 +64,45 @@ module Tabular(T)
       end
     end
   end
+
+  # Define a [`#relay`][Tabular::Habit#relay] completer as an instance method, *name*:
+    #
+    # ```crystal
+    # class MyClass
+    #   Tabular.relay my_completer
+    # end
+    # ```
+    # This is equivalent to:
+    # ```crystal
+    # class MyClass
+    #   def my_completer(words : String) : Bool
+    #     Tabular.form words do relay end
+    #   end
+    # end
+    # ```
+  macro relayer(name)
+    ::Tabular.define {{name}} do relay end
+  end
+
+
+  # Define a [`#relay`][Tabular::Fragments#install] completer, *name*, as an instance method:
+    #
+    # ```crystal
+    # class MyClass
+    #   Tabular.installer my_installer
+    # end
+    # ```
+    # This is equivalent to:
+    # ```crystal
+    # class MyClass
+    #   def my_installer(words : String) : Bool
+    #     Tabular::Fragments.install words
+    #   end
+    # end
+    # ```
+  macro installer(name)
+    def {{name}}(words : Array(String) = ARGV) : Bool
+      Tabular::Fragments.install words
+    end
+  end
 end
