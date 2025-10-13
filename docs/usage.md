@@ -135,6 +135,31 @@ Tabular.form do
 end
 ```
 
+### Relay
+
+When a [`Habit#relay`][Tabular::Habit#relay] exists in a [`Tabular.form`][Tabular.form], the remaining
+(_or specified_) [`Habit#words`][Tabular::Habit#words] will be forwarded to the shell to be completed
+as if the command-line started with those parameters:
+
+```crystal
+if Tabular.prompt?
+  Tabular.form do
+    option "--dir", "-d" do
+      argument directives: :filter_dir
+    end
+
+    relay
+  end
+end
+```
+
+```sh
+# shell suggests all possible commands
+$ my-ctx -d ~/k8s/project ▍
+# shell suggests completions for `kubectl`, if installed
+$ my-ctx -d ~/k8s/project kubectl ▍
+```
+
 ### Flow
 
 ```mermaid

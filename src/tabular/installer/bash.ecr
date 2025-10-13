@@ -51,6 +51,7 @@ __<%= var_name %>_process_completion_results() {
 	local shellCompDirectiveFilterFileExt=<%= Directive::FilterExt.value %>
 	local shellCompDirectiveFilterDirs=<%= Directive::FilterDir.value %>
 	local shellCompDirectiveKeepOrder=<%= Directive::KeepOrder.value %>
+	local shellCompDirectiveRelay=<%= Directive::Relay.value %>
 
 	if (( directive & shellCompDirectiveError )); then
 		__<%= var_name %>_debug "Received error from custom completion go code"
@@ -71,7 +72,15 @@ __<%= var_name %>_process_completion_results() {
 	local activeHelp=()
 	__<%= var_name %>_extract_activeHelp
 
-	if (( directive & shellCompDirectiveFilterFileExt )); then
+	if (( directive & shellCompDirectiveRelay )); then
+		__<%= var_name %>_debug "Relaying completion..."
+		COMP_WORDS=(_)
+		readarray -t -O 1 COMP_WORDS <<<"${out%%$'<%= EOR %>\n'}"
+		COMP_CWORD=$(( ${#COMP_WORDS[@]}-1 ))
+		COMP_LINE=${COMP_WORDS[*]}
+		COMP_POINT=${#COMP_LINE}
+		_command
+	elif (( directive & shellCompDirectiveFilterFileExt )); then
 		local fullFilter="" filter filteringCmd
 
 		for filter in ${completions[*]}; do

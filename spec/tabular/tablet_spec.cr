@@ -1,5 +1,5 @@
-require "./spec_helper"
-require "../src/tabular/*"
+require "../spec_helper"
+require "../../src/tabular/*"
 
 struct Tabular::Tablet
   def with_habit

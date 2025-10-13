@@ -1,5 +1,5 @@
-require "./spec_helper"
-require "../src/tabular/enums"
+require "../spec_helper"
+require "../../src/tabular/enums"
 
 Spectator.describe Tabular::Kind do
   subject { Tabular::Kind }

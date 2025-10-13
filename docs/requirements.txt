@@ -1,8 +1,9 @@
-mkdocs-material
-mkdocstrings-crystal
-mkdocs-gen-files
-mkdocs-literate-nav
-mkdocs-section-index
-pymdown-extensions
-markdown-callouts
-mike
+mkdocs-material~=9.6
+mkdocstrings-crystal~=0.3
+mkdocs-gen-files~=0.5
+mkdocs-literate-nav~=0.6
+mkdocs-section-index~=0.3
+pymdown-extensions~=10.16
+markdown-callouts~=0.4
+mike~=2.1
+mdx_truly_sane_lists~=1.3

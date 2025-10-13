@@ -44,10 +44,10 @@ jobs:
 
       - name: Upload
         run: |
+          set -x
           VERSION=$(echo $GITHUB_REF | cut -d / -f 3 | sed 's/v//')
           echo $VERSION
           git config pull.rebase true
           git fetch origin
-          git pull origin gh-pages
-          mike set-default $VERSION
-          mike deploy --push $VERSION latest
+          mike deploy -u --push $VERSION latest
+          mike set-default --push $VERSION

@@ -1,5 +1,5 @@
-require "./spec_helper"
-require "../src/tabular/log"
+require "../spec_helper"
+require "../../src/tabular/log"
 
 Spectator.describe Tabular::Log do
   let(io) { IO::Memory.new }

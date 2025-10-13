@@ -1,5 +1,5 @@
-require "./spec_helper"
-require "../src/tabular"
+require "../spec_helper"
+require "../../src/tabular"
 
 class Tabular::Habit
   def self.test; new; end
