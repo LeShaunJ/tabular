@@ -25,7 +25,7 @@ Spectator.describe Tabular::Habit do
     [ { Kind::Option,   Directive::FilterDir },
       { Kind::Argument, Directive::KeepOrder },
       { Kind::Command,  Directive::NoSpace   },
-    ].map do |k, d|
+    ].map do |(k, d)|
       {k, d, k.directives}
     end
   end
