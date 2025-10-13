@@ -52,8 +52,10 @@ module Tabular(T)
     # - [`Error::Support`][Tabular::Error::Support] — If shell is unsupported.
   def self.install!(args = ARGV, *, program : String = PROGRAM_NAME, command = Tabular.prompt)
     program = Path.new(program).basename
+    # ameba:disable Lint/UselessAssign
     var_name = program.gsub(/[:-]/, "_")
     shell = Path.new(`ps -p "#{Process.ppid}" -o comm=`.chomp).basename
+    # ameba:disable Lint/UselessAssign
     alternate = ""
 
     while !args.empty?
@@ -74,6 +76,7 @@ module Tabular(T)
     when "bash" then
       STDOUT.puts ECR.render INSTALLER_PATH + "/bash.ecr"
     when "fish" then
+      # ameba:disable Lint/UselessAssign
       active_help_name = "#{program.upcase}_ACTIVE_HELP"
       STDOUT.puts ECR.render INSTALLER_PATH + "/fish.ecr"
     when "zsh" then
