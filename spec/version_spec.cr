@@ -25,7 +25,7 @@ Spectator.describe Tabular::VERSION do
     case status.exit_code?
     when 0 then SemVer.parse(stdout.split(/\/v/)[-1])
     when 2 then SemVer.parse("0.0.0")
-    else raise RuntimeError.from_errno(stderr)
+    else        raise RuntimeError.from_errno(stderr)
     end
   }
   let(shard) {

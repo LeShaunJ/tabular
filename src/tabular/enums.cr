@@ -21,12 +21,20 @@ module Tabular(T)
     Relay
 
     # Returns the `String` representation that will be sent to the shell.
-    def show; ":#{value}"; end
+    def show
+      ":#{value}"
+    end
 
     # :nodoc:
-    def self.from_value(value : self); value; end
+    def self.from_value(value : self)
+      value
+    end
+
     # :nodoc:
-    def self.from_value(value : Nil); Directive::None; end
+    def self.from_value(value : Nil)
+      Directive::None
+    end
+
     # :nodoc:
     def self.from_value(value : Symbol)
       self.parse(value.to_s)
@@ -38,7 +46,6 @@ module Tabular(T)
 
   # Specifiers that determine the functionality of a [`Tablet`][Tabular::Tablet].
   enum Kind
-
     # :nodoc:
     None
     # Specifies that a [`Tablet`][Tabular::Tablet] represents an [`#option`][Tabular::Habit#option] parameter.
@@ -55,12 +62,12 @@ module Tabular(T)
     end
 
     # Returns the default [`Directive`][Tabular::Directive] of the [`Kind`][Tabular::Kind].
-      #
-      # - [`Argument`][Tabular::Kind::Argument] — [`None`][Tabular::Directive::None]
-      # - All others — [`NoFile`][Tabular::Directive::NoFile]
+    #
+    # - [`Argument`][Tabular::Kind::Argument] — [`None`][Tabular::Directive::None]
+    # - All others — [`NoFile`][Tabular::Directive::NoFile]
     def directives
       case self
-      when Kind::Argument then
+      when Kind::Argument
         KIND_DIRECTIVES[self] ||= Directive.from_value(0)
       else
         KIND_DIRECTIVES[self] ||= Directive::NoFile
@@ -68,7 +75,10 @@ module Tabular(T)
     end
 
     # :nodoc:
-    def self.from_value(value : self); value; end
+    def self.from_value(value : self)
+      value
+    end
+
     # :nodoc:
     def self.from_value(value : Symbol)
       self.parse(value.to_s)

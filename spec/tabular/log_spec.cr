@@ -8,7 +8,9 @@ Spectator.describe Tabular::Log do
   before_each { Tabular::Log.dummy = io }
   after_each { io.clear }
 
-  def self.levels; Tabular::Log.names; end
+  def self.levels
+    Tabular::Log.names
+  end
 
   describe "#show" do
     sample levels do |level|
