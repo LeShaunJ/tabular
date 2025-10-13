@@ -101,7 +101,7 @@ module Tabular(T)
 
     # For an [`Option`][Tabular::Kind::Option]-flavoured [`Tablet`][Tabular::Tablet] with `#form?`, yield the next
     # [`Argument`][Tabular::Kind::Argument]-flavoured [`Tablet`][Tabular::Tablet] to the specified `&block`.
-    def next
+    def next(&)
       return if @habit.tablets.empty?
 
       tablet = @habit.tablets.first

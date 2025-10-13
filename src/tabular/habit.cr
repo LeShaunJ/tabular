@@ -17,7 +17,7 @@ module Tabular(T)
       @tablets = Tablets.new
     end
 
-    protected def form(@words = ARGV) : Bool
+    protected def form(@words = ARGV, &) : Bool
       with self yield self
 
       reply

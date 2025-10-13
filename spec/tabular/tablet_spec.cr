@@ -2,7 +2,7 @@ require "../spec_helper"
 require "../../src/tabular/*"
 
 struct Tabular::Tablet
-  def with_habit
+  def with_habit(&)
     with @habit yield
     self
   end
