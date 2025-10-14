@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.1
+
+- **ci**: include `codacy` quality scans
+- **refactor**(test): swap for readability
+- **chore**(quality): correct `Naming/BlockParameterName`
+- **chore**(quality): correct `Lint/Formatting`
+- **chore**(quality): correct `Naming/BlockParameterName`
+- **chore**(quality): correct `Performance/MinMaxAfterMap`
+- **chore**(quality): correct `Lint/MissingBlockArgument`
+- **chore**(quality): ignore `Lint/UselessAssign` for `ECR` variables
+
 ## 0.2.0
 
 - **docs**: update and tweak
