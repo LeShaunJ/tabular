@@ -39,28 +39,30 @@ module Tabular(T)
   end
 
   # Sends a completion script for the `<shell>` specified in *args*.
-    #
-    # - *args*: A list of user-specified arguments for the installer.
-    # - - `<shell>`: The shell to install the completions for (_supports: `bash`, `fish`, `zsh`_).
-    # - - `--development <path>`: An alternate path to alias the CLI name to.
-    # - *program*: The name of the CLI program. Best not to set this one.
-    # - *command*: The subcommand the completion script will call to get completions.
-    #
-    # Raises:
-    #
-    # - [`Error::Argument`][Tabular::Error::Argument] — For malformed CLI arguments.
-    # - [`Error::Support`][Tabular::Error::Support] — If shell is unsupported.
+  #
+  # - *args*: A list of user-specified arguments for the installer.
+  # - - `<shell>`: The shell to install the completions for (_supports: `bash`, `fish`, `zsh`_).
+  # - - `--development <path>`: An alternate path to alias the CLI name to.
+  # - *program*: The name of the CLI program. Best not to set this one.
+  # - *command*: The subcommand the completion script will call to get completions.
+  #
+  # Raises:
+  #
+  # - [`Error::Argument`][Tabular::Error::Argument] — For malformed CLI arguments.
+  # - [`Error::Support`][Tabular::Error::Support] — If shell is unsupported.
   def self.install!(args = ARGV, *, program : String = PROGRAM_NAME, command = Tabular.prompt)
     program = Path.new(program).basename
+    # ameba:disable Lint/UselessAssign
     var_name = program.gsub(/[:-]/, "_")
     shell = Path.new(`ps -p "#{Process.ppid}" -o comm=`.chomp).basename
+    # ameba:disable Lint/UselessAssign
     alternate = ""
 
     while !args.empty?
       arg = args.shift
 
       case arg
-      when "--development" then
+      when "--development"
         raise Error::Argument.new "Must specify an alternate program <path>." if args.empty?
         alternate = args.shift
       else
@@ -71,12 +73,13 @@ module Tabular(T)
     raise Error::Argument.new "Could not determine your shell. Please specify: {bash|fish|zsh}." if shell.empty?
 
     case shell
-    when "bash" then
+    when "bash"
       STDOUT.puts ECR.render INSTALLER_PATH + "/bash.ecr"
-    when "fish" then
+    when "fish"
+      # ameba:disable Lint/UselessAssign
       active_help_name = "#{program.upcase}_ACTIVE_HELP"
       STDOUT.puts ECR.render INSTALLER_PATH + "/fish.ecr"
-    when "zsh" then
+    when "zsh"
       STDOUT.puts ECR.render INSTALLER_PATH + "/zsh.ecr"
     else raise Error::Support.new "Tab completions not supported for '#{shell}' (yet...?)"
     end

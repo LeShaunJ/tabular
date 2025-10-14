@@ -2,7 +2,7 @@ require "../spec_helper"
 require "../../src/tabular/*"
 
 struct Tabular::Tablet
-  def with_habit
+  def with_habit(&)
     with @habit yield
     self
   end
@@ -11,8 +11,8 @@ end
 Spectator.describe Tabular::Tablet do
   def candidate(tablet : Tabular::Tablet, arg : String)
     result = [] of String
-    tablet.candidate arg do |t|
-      result << t
+    tablet.candidate arg do |reply|
+      result << reply
     end
     result
   end

@@ -58,7 +58,7 @@ module Tabular(T)
 
       lines = text.lines
       @@err.puts template % [prefix, lines.shift]
-      lines.each { |l| @@err.puts template % ["", l] }
+      lines.each { |line| @@err.puts template % ["", line] }
       @@err.flush
     end
 
@@ -91,7 +91,7 @@ module Tabular(T)
     end
 
     private def pad
-      @@padding = Log.names.map(&.size).max unless @@padding > 0
+      @@padding = Log.names.max_of(&.size) unless @@padding > 0
       @@padding
     end
 

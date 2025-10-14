@@ -2,7 +2,9 @@ require "../spec_helper"
 require "../../src/tabular"
 
 class Tabular::Habit
-  def self.test; new; end
+  def self.test
+    new
+  end
 end
 
 alias Kind = Tabular::Kind
@@ -22,17 +24,17 @@ Spectator.describe Tabular::Habit do
   end
 
   def self.dir_samples : Array(Tuple(Kind, Directive, Directive))
-    [ { Kind::Option,   Directive::FilterDir },
-      { Kind::Argument, Directive::KeepOrder },
-      { Kind::Command,  Directive::NoSpace   },
-    ].map do |k, d|
+    [{Kind::Option, Directive::FilterDir},
+     {Kind::Argument, Directive::KeepOrder},
+     {Kind::Command, Directive::NoSpace},
+    ].map do |(k, d)|
       {k, d, k.directives}
     end
   end
 
   describe "#directives" do
     sample dir_samples do |kind, directive, previous|
-      after_each  { subject.directives kind, previous }
+      after_each { subject.directives kind, previous }
 
       it "sets the global directives" do
         subject.directives kind, directive

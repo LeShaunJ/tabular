@@ -25,7 +25,7 @@ Spectator.describe Tabular::VERSION do
     case status.exit_code?
     when 0 then SemVer.parse(stdout.split(/\/v/)[-1])
     when 2 then SemVer.parse("0.0.0")
-    else raise RuntimeError.from_errno(stderr)
+    else        raise RuntimeError.from_errno(stderr)
     end
   }
   let(shard) {
@@ -39,6 +39,6 @@ Spectator.describe Tabular::VERSION do
   end
 
   it "is set in shard.yml" do
-    expect(current.to_s).to eq(shard["version"]?)
+    expect(shard["version"]?).to eq(current.to_s)
   end
 end

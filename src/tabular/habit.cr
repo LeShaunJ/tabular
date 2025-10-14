@@ -17,7 +17,7 @@ module Tabular(T)
       @tablets = Tablets.new
     end
 
-    protected def form(@words = ARGV) : Bool
+    protected def form(@words = ARGV, &) : Bool
       with self yield self
 
       reply
@@ -36,17 +36,17 @@ module Tabular(T)
 
     # Specify the global string of characters that may delimit an [`Option`][Tabular::Kind::Option]-flavour
     # [`Tablet`][Tabular::Tablet].
-      #
-      # ```crystal
-      # Tabular.form do
-      #   # Allows for something like `--option=`
-      #   delimiters "="
-      #   # Allows for something like `-option:`
-      #   delimiters ":"
-      #   # Allows for all of the above
-      #   delimiters ":="
-      # end
-      # ```
+    #
+    # ```
+    # Tabular.form do
+    #   # Allows for something like `--option=`
+    #   delimiters "="
+    #   # Allows for something like `-option:`
+    #   delimiters ":"
+    #   # Allows for all of the above
+    #   delimiters ":="
+    # end
+    # ```
     def delimiters(value : String)
       Tabular.delimiters = value
     end
@@ -62,122 +62,124 @@ module Tabular(T)
     end
 
     # Create a [`Option`][Tabular::Kind::Option]-flavoured [`Tablet`][Tabular::Tablet].
-      #
-      # - *name*: See [`Tablet#name`][Tabular::Tablet#name].
-      # - *aliases*: See [`Tablet#aliases`][Tabular::Tablet#aliases].
-      # - *help*: See [`Tablet#help`][Tabular::Tablet#help].
-      # - *directives*: See [`Directive`][Tabular::Directive].
-      # - *delimiters*: Ad hoc delimiters that will override [`#delimiters`][Tabular::Habit#delimiters].
-      # - *repeatable*: See [`Tablet#repeatable?`][Tabular::Tablet#repeatable?].
+    #
+    # - *name*: See [`Tablet#name`][Tabular::Tablet#name].
+    # - *aliases*: See [`Tablet#aliases`][Tabular::Tablet#aliases].
+    # - *help*: See [`Tablet#help`][Tabular::Tablet#help].
+    # - *directives*: See [`Directive`][Tabular::Directive].
+    # - *delimiters*: Ad hoc delimiters that will override [`#delimiters`][Tabular::Habit#delimiters].
+    # - *repeatable*: See [`Tablet#repeatable?`][Tabular::Tablet#repeatable?].
     def option(name : String, *aliases, help = "", directives : Directable? = nil, delimiters = Tabular.delimiters, repeatable = false)
       self << Tablet.new :option, name, aliases, help, directives: directives, delimiters: delimiters, repeatable: repeatable
     end
 
     # Create a [`Option`][Tabular::Kind::Option]-flavoured [`Tablet`][Tabular::Tablet] with expected
     # [`Argument`][Tabular::Kind::Argument]-flavoured [`Tablet`][Tabular::Tablet](s):
-      #
-      # ```cystall
-      # option "--opt" do
-      #   argument "arg1_choice1", "arg1_choice2", "arg1_choice3"
-      #   argument "arg2_choice1", "arg2_choice2"
-      # end
-      # ```
-      #
-      # - *name*: See [`Tablet#name`][Tabular::Tablet#name].
-      # - *aliases*: See [`Tablet#aliases`][Tabular::Tablet#aliases].
-      # - *help*: See [`Tablet#help`][Tabular::Tablet#help].
-      # - *delimiters*: Ad hoc delimiters that will override [`#delimiters`][Tabular::Habit#delimiters].
-      # - *repeatable*: See [`Tablet#repeatable?`][Tabular::Tablet#repeatable?].
+    #
+    # ```
+    # option "--opt" do
+    #   argument "arg1_choice1", "arg1_choice2", "arg1_choice3"
+    #   argument "arg2_choice1", "arg2_choice2"
+    # end
+    # ```
+    #
+    # - *name*: See [`Tablet#name`][Tabular::Tablet#name].
+    # - *aliases*: See [`Tablet#aliases`][Tabular::Tablet#aliases].
+    # - *help*: See [`Tablet#help`][Tabular::Tablet#help].
+    # - *delimiters*: Ad hoc delimiters that will override [`#delimiters`][Tabular::Habit#delimiters].
+    # - *repeatable*: See [`Tablet#repeatable?`][Tabular::Tablet#repeatable?].
     def option(name : String, *aliases, help = "", delimiters = Tabular.delimiters, repeatable = false, &)
       with_habit option(name, *aliases, help, delimiters: delimiters, repeatable: repeatable)
     end
 
     # Create a [`Argument`][Tabular::Kind::Argument]-flavoured [`Tablet`][Tabular::Tablet].
-      #
-      # - *choice*: Any number of possible values for the argument. If `empty?`, any value is accepted.
-      # - *help*: See [`Tablet#help`][Tabular::Tablet#help].
-      # - *directives*: See [`Directive`][Tabular::Directive].
+    #
+    # - *choice*: Any number of possible values for the argument. If `empty?`, any value is accepted.
+    # - *help*: See [`Tablet#help`][Tabular::Tablet#help].
+    # - *directives*: See [`Directive`][Tabular::Directive].
     def argument(*choice, help = "", directives : Directable? = nil)
       argument [*choice] of String, help, directives: directives
     end
 
     # Create a [`Argument`][Tabular::Kind::Argument]-flavoured [`Tablet`][Tabular::Tablet].
-      #
-      # - *choices*: A set of possible values for the argument. If `empty?`, any value is accepted.
-      # - *help*: See [`Tablet#help`][Tabular::Tablet#help].
-      # - *directives*: See [`Directive`][Tabular::Directive].
+    #
+    # - *choices*: A set of possible values for the argument. If `empty?`, any value is accepted.
+    # - *help*: See [`Tablet#help`][Tabular::Tablet#help].
+    # - *directives*: See [`Directive`][Tabular::Directive].
     def argument(choices : Array(String), help : String = "", directives : Directable? = nil)
       self << Tablet.new :argument, "", choices, help, directives: directives
     end
 
     # Create a [`Command`][Tabular::Kind::Command]-flavoured [`Tablet`][Tabular::Tablet].
-      #
-      # - *name*: See [`Tablet#name`][Tabular::Tablet#name].
-      # - *aliases*: See [`Tablet#aliases`][Tabular::Tablet#aliases].
-      # - *help*: See [`Tablet#help`][Tabular::Tablet#help].
-      # - *directives*: See [`Directive`][Tabular::Directive].
+    #
+    # - *name*: See [`Tablet#name`][Tabular::Tablet#name].
+    # - *aliases*: See [`Tablet#aliases`][Tabular::Tablet#aliases].
+    # - *help*: See [`Tablet#help`][Tabular::Tablet#help].
+    # - *directives*: See [`Directive`][Tabular::Directive].
     def command(name : String, aliases : Array(String) = [] of String, help = "", directives : Directable? = nil)
       self << Tablet.new :command, name, aliases, help, directives
     end
+
     # :ditto:
     def command(name : String, *aliases, help = "", directives : Tabular::Directable? = nil)
-      command name, [ *aliases ] of String, help, directives
+      command name, [*aliases] of String, help, directives
     end
 
     # Create a [`Command`][Tabular::Kind::Command]-flavoured [`Tablet`][Tabular::Tablet] along with
     # its nested formation:
-      #
-      # ```cystall
-      # Tabular.form do
-      #   command "cmd1", help: "command with dispatched completions"
-      #
-      #   command "cmd2", help: "command with inline completions" do
-      #     option "--file", "-f" { argument }
-      #     option "--debug"
-      #     command "sub1"
-      #     command "arg2_choice1", "arg2_choice2"
-      #   end
-      #
-      #   # will never trigger on `cmd2`
-      #   dispatch do |command|
-      #     Command1.complete if command.name == "cmd1"
-      #   end
-      # end
-      # ```
-      #
-      # - *name*: See [`Tablet#name`][Tabular::Tablet#name].
-      # - *aliases*: See [`Tablet#aliases`][Tabular::Tablet#aliases].
-      # - *help*: See [`Tablet#help`][Tabular::Tablet#help].
-      # - *directives*: See [`Directive`][Tabular::Directive].
+    #
+    # ```
+    # Tabular.form do
+    #   command "cmd1", help: "command with dispatched completions"
+    #
+    #   command "cmd2", help: "command with inline completions" do
+    #     option "--file", "-f" { argument }
+    #     option "--debug"
+    #     command "sub1"
+    #     command "arg2_choice1", "arg2_choice2"
+    #   end
+    #
+    #   # will never trigger on `cmd2`
+    #   dispatch do |command|
+    #     Command1.complete if command.name == "cmd1"
+    #   end
+    # end
+    # ```
+    #
+    # - *name*: See [`Tablet#name`][Tabular::Tablet#name].
+    # - *aliases*: See [`Tablet#aliases`][Tabular::Tablet#aliases].
+    # - *help*: See [`Tablet#help`][Tabular::Tablet#help].
+    # - *directives*: See [`Directive`][Tabular::Directive].
     def command(name : String, aliases : Array(String) = [] of String, help = "", directives : Directable? = nil, &)
       with_habit command(name, aliases, help, directives)
     end
+
     # :ditto:
     def command(name : String, *aliases, help = "", directives : Tabular::Directable? = nil, &)
-      with_habit command(name, [ *aliases ] of String, help, directives)
+      with_habit command(name, [*aliases] of String, help, directives)
     end
 
     # Create a [`Tablet`][Tabular::Tablet] for the [`Command`][Tabular::Kind::Command] that installs
     # completions on your users' shell.
-      #
-      # ```crystal
-      # if Tabular.prompt?
-      #   Tabular.form do
-      #     command "cmd1"
-      #     command "cmd2"
-      #
-      #     # will complete `setup-tab` and possible params
-      #     installer "setup-tab"
-      #
-      #     dispatch do |command|
-      #       # handle `cmd1` & `cmd2`
-      #     end
-      #   end
-      # end
-      # ```
-      #
-      # - *name*: See [`Tablet#name`][Tabular::Tablet#name].
-      # - *help*: See [`Tablet#help`][Tabular::Tablet#help].
+    #
+    # ```
+    # if Tabular.prompt?
+    #   Tabular.form do
+    #     command "cmd1"
+    #     command "cmd2"
+    #
+    #     # will complete `setup-tab` and possible params
+    #     installer "setup-tab"
+    #
+    #     dispatch do |command|
+    #       # handle `cmd1` & `cmd2`
+    #     end
+    #   end
+    # end
+    # ```
+    #
+    # - *name*: See [`Tablet#name`][Tabular::Tablet#name].
+    # - *help*: See [`Tablet#help`][Tabular::Tablet#help].
     def installer(name = "completion", help = "install [TAB] completions")
       command name, help: help do
         SHELLS.each do |shell|
@@ -194,36 +196,36 @@ module Tabular(T)
     end
 
     # Create a [`Command`][Tabular::Kind::Command] that yield completions for *words* back to the shell:
-      #
-      # ```crystal
-      # if Tabular.prompt?
-      #   Tabular.form do
-      #     relay
-      #   end
-      # end
-      # ```
-      #
-      # Completions from the point of this [`Tablet`][Tabular::Tablet] are generated as if the
-      # command-line started with the remaining [`#words`][Tabular::Habit#words]. This is useful
-      # for `sudo`-like commands that expect a command prompt to run in a specific context.
+    #
+    # ```
+    # if Tabular.prompt?
+    #   Tabular.form do
+    #     relay
+    #   end
+    # end
+    # ```
+    #
+    # Completions from the point of this [`Tablet`][Tabular::Tablet] are generated as if the
+    # command-line started with the remaining [`#words`][Tabular::Habit#words]. This is useful
+    # for `sudo`-like commands that expect a command prompt to run in a specific context.
     def relay(words : Array(String) = @words)
       tablet :none, "#{words.join("\n")}#{EOR}", directives: :relay
     end
 
     # Yield control back to the CLI with *block* when a [`Command`][Tabular::Kind::Command] is matched:
-      #
-      # ```crystal
-      # if Tabular.prompt?
-      #   Tabular.form do
-      #     command "cmd1"
-      #     command "cmd2"
-      #
-      #     dispatch do |command|
-      #       # bespoke handling
-      #     end
-      #   end
-      # end
-      # ```
+    #
+    # ```
+    # if Tabular.prompt?
+    #   Tabular.form do
+    #     command "cmd1"
+    #     command "cmd2"
+    #
+    #     dispatch do |command|
+    #       # bespoke handling
+    #     end
+    #   end
+    # end
+    # ```
     def dispatch(&block : Tablet -> Bool)
       @replier = block
       return
@@ -274,9 +276,9 @@ module Tabular(T)
         word = words.shift
         Tabular::Log::Debug.show "ARG: '#{word}' | LEFT: #{words} (#{words.object_id})"
 
-        next if current.next do |a|
-          current = Tablet::NONE if a.match!(word)
-        end
+        next if current.next do |name|
+                  current = Tablet::NONE if name.match!(word)
+                end
 
         current = find(tablets, word)
         next if current.kind.none?
@@ -292,7 +294,7 @@ module Tabular(T)
     end
 
     protected def self.directives(tablets : Tablets)
-      tablets.reduce(Directive::None) { |a, t| a | t.directives }
+      tablets.reduce(Directive::None) { |acc, tablet| acc | tablet.directives }
     end
 
     private macro with_habit(tablet)
