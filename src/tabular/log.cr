@@ -58,7 +58,7 @@ module Tabular(T)
 
       lines = text.lines
       @@err.puts template % [prefix, lines.shift]
-      lines.each { |l| @@err.puts template % ["", l] }
+      lines.each { |line| @@err.puts template % ["", line] }
       @@err.flush
     end
 

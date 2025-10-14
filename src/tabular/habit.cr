@@ -276,8 +276,8 @@ module Tabular(T)
         word = words.shift
         Tabular::Log::Debug.show "ARG: '#{word}' | LEFT: #{words} (#{words.object_id})"
 
-        next if current.next do |a|
-                  current = Tablet::NONE if a.match!(word)
+        next if current.next do |name|
+                  current = Tablet::NONE if name.match!(word)
                 end
 
         current = find(tablets, word)
@@ -294,7 +294,7 @@ module Tabular(T)
     end
 
     protected def self.directives(tablets : Tablets)
-      tablets.reduce(Directive::None) { |a, t| a | t.directives }
+      tablets.reduce(Directive::None) { |acc, tablet| acc | tablet.directives }
     end
 
     private macro with_habit(tablet)

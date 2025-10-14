@@ -69,12 +69,12 @@ module Tabular(T)
     # Yield suggestions for any names that contain *word*.
     def candidate(word : String, & : String ->)
       return if skip?(word)
-      return @aliases.each { |a| yield show(a) } if always_suggest?
+      return @aliases.each { |name| yield show(name) } if always_suggest?
 
-      @aliases.each do |a|
-        next unless a.starts_with?(word)
+      @aliases.each do |name|
+        next unless name.starts_with?(word)
 
-        yield show(a)
+        yield show(name)
       end
     end
 
@@ -89,8 +89,8 @@ module Tabular(T)
     def match?(word : String) : Bool
       return true if passthru? || @aliases.empty?
 
-      @aliases.find_value(false) do |a|
-        delimited?(word, a) || a == word
+      @aliases.find_value(false) do |name|
+        delimited?(word, name) || name == word
       end
     end
 
