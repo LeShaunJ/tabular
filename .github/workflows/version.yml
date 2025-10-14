@@ -6,7 +6,8 @@ on:
       - main
 
 jobs:
-  build:
+  check:
+    name: Check
     runs-on: ubuntu-latest
     steps:
       - name: Download source

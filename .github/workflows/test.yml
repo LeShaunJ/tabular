@@ -16,8 +16,23 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+  checks: write
+
 jobs:
-  build:
+  event_file:
+    name: Event File
+    runs-on: ubuntu-latest
+    steps:
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: Event File
+          path: ${{ github.event_path }}
+
+  build-and-test:
+    name: Build and Test
     strategy:
       fail-fast: false
       matrix:
@@ -51,4 +66,11 @@ jobs:
         run: shards update
 
       - name: Run tests
-        run: crystal spec -v --fail-fast spec/tabular
+        run: crystal spec -v --fail-fast spec/tabular --junit_output crtest.xml
+
+      - name: Upload Test Results
+        if: (!cancelled())
+        uses: actions/upload-artifact@v4
+        with:
+          name: Test Results (Crystal ${{ matrix.crystal }}; ${{ runner.os }})
+          path: crtest.xml
