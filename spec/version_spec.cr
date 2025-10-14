@@ -39,6 +39,6 @@ Spectator.describe Tabular::VERSION do
   end
 
   it "is set in shard.yml" do
-    expect(current.to_s).to eq(shard["version"]?)
+    expect(shard["version"]?).to eq(current.to_s)
   end
 end
