@@ -1,5 +1,5 @@
-require "../spec_helper"
-require "../../src/tabular/*"
+require "./spec_helper"
+require "../src/tabular/*"
 
 struct Tabular::Tablet
   def with_habit(&)
@@ -8,7 +8,7 @@ struct Tabular::Tablet
   end
 end
 
-Spectator.describe Tabular::Tablet do
+Spectator.describe Tabular::Tablet, :library do
   def candidate(tablet : Tabular::Tablet, arg : String)
     result = [] of String
     tablet.candidate arg do |reply|

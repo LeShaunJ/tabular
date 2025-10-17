@@ -13,7 +13,7 @@ struct SemanticVersion
   end
 end
 
-Spectator.describe Tabular::VERSION do
+Spectator.describe Tabular::VERSION, :version do
   let(current) { SemVer.parse(Tabular::VERSION) }
   let(latest) {
     args = %w(ls-remote -t --sort -v:refname --refs --exit-code origin)

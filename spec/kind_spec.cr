@@ -1,7 +1,7 @@
-require "../spec_helper"
-require "../../src/tabular/enums"
+require "./spec_helper"
+require "../src/tabular/enums"
 
-Spectator.describe Tabular::Kind do
+Spectator.describe Tabular::Kind, :library do
   subject { Tabular::Kind }
   let(none) { Tabular::Kind::None }
 

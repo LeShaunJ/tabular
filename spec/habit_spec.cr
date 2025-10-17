@@ -1,5 +1,5 @@
-require "../spec_helper"
-require "../../src/tabular"
+require "./spec_helper"
+require "../src/tabular"
 
 class Tabular::Habit
   def self.test
@@ -11,7 +11,7 @@ alias Kind = Tabular::Kind
 alias Directive = Tabular::Directive
 alias Tablet = Tabular::Tablet
 
-Spectator.describe Tabular::Habit do
+Spectator.describe Tabular::Habit, :library do
   subject { Tabular::Habit.test }
 
   describe "#delimiters" do
