@@ -247,11 +247,11 @@ module Tabular(T)
         return @replier.call runnable
       end
 
-      delimit_override = Habit.find(tablets_, words[0])
+      delimit_override = Habit.find_delimited(tablets_, words[0])
       current = delimit_override unless delimit_override.kind.none?
       tablets_ = current.habit.tablets if current.form?
 
-      Habit.suggest tablets_, words[0]
+      Habit.suggest tablets_, *current.to_prefix(words[0])
 
       true
     rescue Tabular::Error::Match
@@ -260,6 +260,10 @@ module Tabular(T)
 
     protected def self.find(tablets : Tablets, word : String)
       tablets.find &.match?(word) || Tablet::NONE
+    end
+
+    protected def self.find_delimited(tablets : Tablets, word : String)
+      tablets.find &.delimits?(word) || Tablet::NONE
     end
 
     protected def self.traverse(tablets : Tablets, words : Array(String), & : Tablet -> Bool) : Tablet

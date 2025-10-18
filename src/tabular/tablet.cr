@@ -43,6 +43,7 @@ module Tabular(T)
     getter :directives
 
     protected getter :habit
+    protected getter :delimiters
 
     # Create a new [`Tablet`][Tabular::Tablet].
     #
@@ -57,7 +58,7 @@ module Tabular(T)
       @aliases = [name].concat(aliases).reject(&.empty?).to_set
       @help = truncate(help)
       @directives = directives.nil? ? @kind.directives : Directive.from_value(directives)
-      @delimiters = delimiters.empty? ? "" : "[#{delimiters}]?"
+      @delimiters = delimiters.empty? ? "" : "[#{delimiters}]"
       @habit = Habit.new
     end
 
@@ -67,14 +68,14 @@ module Tabular(T)
     end
 
     # Yield suggestions for any names that contain *word*.
-    def candidate(word : String, & : String ->)
+    def candidate(word : String, prefix : String = "", & : String ->)
       return if skip?(word)
       return @aliases.each { |name| yield show(name) } if always_suggest?
 
       @aliases.each do |name|
         next unless name.starts_with?(word)
 
-        yield show(name)
+        yield show("#{prefix}#{name}")
       end
     end
 
@@ -94,6 +95,11 @@ module Tabular(T)
       end
     end
 
+    # Return `true` if *word* is a delimited match of any names.
+    def delimits?(word : String) : Bool
+      @aliases.find_value(false) { |name| delimited?(word, name) }
+    end
+
     # Return `true` if a nested form exists.
     def form?
       @has_form ||= !@habit.tablets.empty?
@@ -110,6 +116,16 @@ module Tabular(T)
       yield tablet
     end
 
+    # Return the specified *word* and possible prefix, if delimited.
+    def to_prefix(word : String) : Tuple(String, String)
+      raise Regex::Error.new if @delimiters.empty?
+
+      _, prefix, arg = word.match!(/^(.+?#{@delimiters})(.*)$/)
+      {arg, prefix}
+    rescue e : Regex::Error
+      {word, ""}
+    end
+
     def to_s(io : IO)
       io << show
     end
@@ -122,7 +138,7 @@ module Tabular(T)
       return false if @delimiters.empty?
       return false unless form?
 
-      /^#{name}#{@delimiters}$/.matches?(word)
+      /^#{name}#{@delimiters}/.matches?(word)
     end
 
     private def always_suggest?
@@ -130,11 +146,14 @@ module Tabular(T)
     end
 
     private def passthru?
-      @passthru ||= (kind.argument? && (directives.filter_ext? || directives.filter_dir?)).as(Bool)
+      # TODO: swap???
+      # @passthru ||= (kind.argument? && (directives.filter_ext? || directives.filter_dir?)).as(Bool)
+      @passthru ||= (directives.filter_ext? || directives.filter_dir?).as(Bool)
     end
 
     private def show(name : String = @name)
-      "#{name}\t#{@help}".rstrip "\t"
+      # "#{name}\t#{@help}".rstrip "\t" # TODO: decide...
+      "#{(name.empty? ? @aliases.join('|') : name)}\t#{@help}".rstrip "\t"
     end
 
     private def truncate(text : String)
