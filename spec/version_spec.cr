@@ -4,7 +4,6 @@ require "semantic_version"
 require "yaml"
 
 alias SemVer = SemanticVersion
-PIPE = Process::Redirect::Pipe
 
 struct SemanticVersion
   # Ensure human-readable output
