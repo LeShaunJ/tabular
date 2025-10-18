@@ -270,9 +270,7 @@ module Tabular(T)
         word = words.shift
         Tabular::Log::Debug.show "ARG: '#{word}' | LEFT: #{words} (#{words.object_id})"
 
-        next if current.next do |name|
-                  current = Tablet::NONE if name.match!(word)
-                end
+        next if current.next { |name| current = Tablet::NONE if name.match!(word) }
 
         current = find(tablets, word)
         next if current.kind.none?
