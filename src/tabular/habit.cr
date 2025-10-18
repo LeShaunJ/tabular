@@ -107,7 +107,7 @@ module Tabular(T)
     # - *help*: See [`Tablet#help`][Tabular::Tablet#help].
     # - *directives*: See [`Directive`][Tabular::Directive].
     def argument(choices : Array(String), help : String = "", directives : Directable? = nil)
-      self << Tablet.new :argument, "", choices, help, directives: directives
+      self << Tablet.new :argument, "", choices, help, directives, ""
     end
 
     # Create a [`Command`][Tabular::Kind::Command]-flavoured [`Tablet`][Tabular::Tablet].
@@ -117,7 +117,7 @@ module Tabular(T)
     # - *help*: See [`Tablet#help`][Tabular::Tablet#help].
     # - *directives*: See [`Directive`][Tabular::Directive].
     def command(name : String, aliases : Array(String) = [] of String, help = "", directives : Directable? = nil)
-      self << Tablet.new :command, name, aliases, help, directives
+      self << Tablet.new :command, name, aliases, help, directives, ""
     end
 
     # :ditto:
