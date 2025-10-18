@@ -89,7 +89,7 @@ module Tabular(T)
     # - *delimiters*: Ad hoc delimiters that will override [`#delimiters`][Tabular::Habit#delimiters].
     # - *repeatable*: See [`Tablet#repeatable?`][Tabular::Tablet#repeatable?].
     def option(name : String, *aliases, help = "", delimiters = Tabular.delimiters, repeatable = false, &)
-      with_habit option(name, *aliases, help, delimiters: delimiters, repeatable: repeatable)
+      with_habit option(name, *aliases, help: help, delimiters: delimiters, repeatable: repeatable)
     end
 
     # Create a [`Argument`][Tabular::Kind::Argument]-flavoured [`Tablet`][Tabular::Tablet].
@@ -97,7 +97,7 @@ module Tabular(T)
     # - *choice*: Any number of possible values for the argument. If `empty?`, any value is accepted.
     # - *help*: See [`Tablet#help`][Tabular::Tablet#help].
     # - *directives*: See [`Directive`][Tabular::Directive].
-    def argument(*choice, help = "", directives : Directable? = nil)
+    def argument(*choice, help : String = "", directives : Directable? = nil)
       argument [*choice] of String, help, directives: directives
     end
 
