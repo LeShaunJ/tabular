@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.3.0
+
+- **docs**: add shell support
+- **fix**(fish): option bug
+- **fix**(habit,tablet): ensure delimited options are suggested
+- **fix**(habit): ensure no delimiters for non-option builtins
+- **fix**(habit): ensure variadic does not catch `help:` value
+- **style**(habit): whitespace, correct debugging
+- **refactor**(habit): traverse method
+- **refactor**(habit): swap `tablets` var with `tablets_`
+- **refactor**(habit): move suggester to its own method
+- **ci**: add issue forms; format issue templates
+- **ci**: use tags over explicit files
+- **test**(cli): commad-line functionality
+- **test**(spec_helper): move `PIPE` alias
+- **test**: use tags
+- **chore**: ignore `.vscode`
+
 ## 0.2.1
 
 - **ci**: include `codacy` quality scans

@@ -66,7 +66,9 @@ jobs:
         run: shards update
 
       - name: Run tests
-        run: crystal spec -v --fail-fast spec/tabular --junit_output crtest.xml
+        run: >-
+          shards build &&
+          crystal spec -v --fail-fast --tag library --junit_output crtest.xml
 
       - name: Upload Test Results
         if: (!cancelled())

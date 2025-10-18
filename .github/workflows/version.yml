@@ -22,4 +22,4 @@ jobs:
         run: shards update
 
       - name: Run tests
-        run: crystal spec -v --fail-fast spec/version_spec.cr
+        run: crystal spec -v --fail-fast --tag version

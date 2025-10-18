@@ -1,7 +1,7 @@
-require "../spec_helper"
-require "../../src/tabular/enums"
+require "./spec_helper"
+require "../src/tabular/enums"
 
-Spectator.describe Tabular::Directive do
+Spectator.describe Tabular::Directive, :library do
   subject { Tabular::Directive }
   let(none) { Tabular::Directive::None }
 

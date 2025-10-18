@@ -1,7 +1,7 @@
-require "../spec_helper"
-require "../../src/tabular/log"
+require "./spec_helper"
+require "../src/tabular/log"
 
-Spectator.describe Tabular::Log do
+Spectator.describe Tabular::Log, :library do
   let(io) { IO::Memory.new }
   let(msg) { "hello, world" }
 

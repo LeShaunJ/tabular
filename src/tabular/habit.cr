@@ -89,7 +89,7 @@ module Tabular(T)
     # - *delimiters*: Ad hoc delimiters that will override [`#delimiters`][Tabular::Habit#delimiters].
     # - *repeatable*: See [`Tablet#repeatable?`][Tabular::Tablet#repeatable?].
     def option(name : String, *aliases, help = "", delimiters = Tabular.delimiters, repeatable = false, &)
-      with_habit option(name, *aliases, help, delimiters: delimiters, repeatable: repeatable)
+      with_habit option(name, *aliases, help: help, delimiters: delimiters, repeatable: repeatable)
     end
 
     # Create a [`Argument`][Tabular::Kind::Argument]-flavoured [`Tablet`][Tabular::Tablet].
@@ -97,7 +97,7 @@ module Tabular(T)
     # - *choice*: Any number of possible values for the argument. If `empty?`, any value is accepted.
     # - *help*: See [`Tablet#help`][Tabular::Tablet#help].
     # - *directives*: See [`Directive`][Tabular::Directive].
-    def argument(*choice, help = "", directives : Directable? = nil)
+    def argument(*choice, help : String = "", directives : Directable? = nil)
       argument [*choice] of String, help, directives: directives
     end
 
@@ -107,7 +107,7 @@ module Tabular(T)
     # - *help*: See [`Tablet#help`][Tabular::Tablet#help].
     # - *directives*: See [`Directive`][Tabular::Directive].
     def argument(choices : Array(String), help : String = "", directives : Directable? = nil)
-      self << Tablet.new :argument, "", choices, help, directives: directives
+      self << Tablet.new :argument, "", choices, help, directives, ""
     end
 
     # Create a [`Command`][Tabular::Kind::Command]-flavoured [`Tablet`][Tabular::Tablet].
@@ -117,7 +117,7 @@ module Tabular(T)
     # - *help*: See [`Tablet#help`][Tabular::Tablet#help].
     # - *directives*: See [`Directive`][Tabular::Directive].
     def command(name : String, aliases : Array(String) = [] of String, help = "", directives : Directable? = nil)
-      self << Tablet.new :command, name, aliases, help, directives
+      self << Tablet.new :command, name, aliases, help, directives, ""
     end
 
     # :ditto:
@@ -239,26 +239,19 @@ module Tabular(T)
     protected def reply(words = @words) : Bool
       return true if words.empty?
 
-      tablets = @tablets
-      current = Habit.traverse(tablets, words) do |runnable|
+      tablets_ = @tablets
+      current = Habit.traverse(tablets_, words) do |runnable|
         Log::Debug.show "RUN: #{runnable}"
 
         return runnable.habit.reply words if runnable.form?
-
         return @replier.call runnable
       end
 
-      delimit_override = Habit.find(tablets, words[0])
+      delimit_override = Habit.find_delimited(tablets_, words[0])
       current = delimit_override unless delimit_override.kind.none?
-      tablets = current.habit.tablets if current.form?
+      tablets_ = current.habit.tablets if current.form?
 
-      tablets.each do |tablet|
-        tablet.candidate words[0] do |suggestion|
-          Log.out suggestion
-        end
-      end
-
-      Log.out Habit.directives(tablets).show
+      Habit.suggest tablets_, *current.to_prefix(words[0])
 
       true
     rescue Tabular::Error::Match
@@ -269,16 +262,18 @@ module Tabular(T)
       tablets.find &.match?(word) || Tablet::NONE
     end
 
+    protected def self.find_delimited(tablets : Tablets, word : String)
+      tablets.find &.delimits?(word) || Tablet::NONE
+    end
+
     protected def self.traverse(tablets : Tablets, words : Array(String), & : Tablet -> Bool) : Tablet
       current = Tablet::NONE
 
       while words.size > 1
         word = words.shift
-        Tabular::Log::Debug.show "ARG: '#{word}' | LEFT: #{words} (#{words.object_id})"
+        Tabular::Log::Debug.show "ARG: '#{word}' | LEFT: #{words}"
 
-        next if current.next do |name|
-                  current = Tablet::NONE if name.match!(word)
-                end
+        next if current.next { |name| current = Tablet::NONE if name.match!(word) }
 
         current = find(tablets, word)
         next if current.kind.none?
@@ -293,8 +288,18 @@ module Tabular(T)
       current
     end
 
-    protected def self.directives(tablets : Tablets)
-      tablets.reduce(Directive::None) { |acc, tablet| acc | tablet.directives }
+    protected def self.suggest(tablets : Tablets, word : String, prefix : String = "")
+      directives_ = Directive::None
+
+      tablets.each do |tablet|
+        tablet.candidate(word, prefix) do |suggestion|
+          # TODO: figure out an efficient way to get the directives
+          directives_ |= tablet.directives
+          Log.out suggestion
+        end
+      end
+
+      Log.out directives_.show
     end
 
     private macro with_habit(tablet)

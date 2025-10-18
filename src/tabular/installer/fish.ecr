@@ -141,7 +141,7 @@ function __<%= var_name %>_prepare_completions
 	if test $relay -eq 1
 		__<%= var_name %>_debug "Relaying completions"
 		set --global words $__<%= var_name %>_comp_results[1..-2]
-		set --global words $words $(string trim --right --char '<%= EOR %>' $__<%= var_name %>_comp_results[-1])
+		set --global words $words $(string trim --right --char '<%= EOR %>' -- $__<%= var_name %>_comp_results[-1])
 		__<%= var_name %>_debug "\$words[$(count $words)]=($words)"
 		set --global __<%= var_name %>_comp_results (complete -C "$words")
 		return 0
