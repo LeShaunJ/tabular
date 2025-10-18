@@ -239,8 +239,8 @@ module Tabular(T)
     protected def reply(words = @words) : Bool
       return true if words.empty?
 
-      tablets = @tablets
-      current = Habit.traverse(tablets, words) do |runnable|
+      tablets_ = @tablets
+      current = Habit.traverse(tablets_, words) do |runnable|
         Log::Debug.show "RUN: #{runnable}"
 
         return runnable.habit.reply words if runnable.form?
@@ -248,11 +248,11 @@ module Tabular(T)
         return @replier.call runnable
       end
 
-      delimit_override = Habit.find(tablets, words[0])
+      delimit_override = Habit.find(tablets_, words[0])
       current = delimit_override unless delimit_override.kind.none?
-      tablets = current.habit.tablets if current.form?
+      tablets_ = current.habit.tablets if current.form?
 
-      Habit.suggest tablets, words[0]
+      Habit.suggest tablets_, words[0]
 
       true
     rescue Tabular::Error::Match
