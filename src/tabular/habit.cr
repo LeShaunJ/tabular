@@ -244,7 +244,6 @@ module Tabular(T)
         Log::Debug.show "RUN: #{runnable}"
 
         return runnable.habit.reply words if runnable.form?
-
         return @replier.call runnable
       end
 
@@ -268,7 +267,7 @@ module Tabular(T)
 
       while words.size > 1
         word = words.shift
-        Tabular::Log::Debug.show "ARG: '#{word}' | LEFT: #{words} (#{words.object_id})"
+        Tabular::Log::Debug.show "ARG: '#{word}' | LEFT: #{words}"
 
         next if current.next { |name| current = Tablet::NONE if name.match!(word) }
 
