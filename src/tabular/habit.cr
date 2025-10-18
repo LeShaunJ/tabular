@@ -252,13 +252,7 @@ module Tabular(T)
       current = delimit_override unless delimit_override.kind.none?
       tablets = current.habit.tablets if current.form?
 
-      tablets.each do |tablet|
-        tablet.candidate words[0] do |suggestion|
-          Log.out suggestion
-        end
-      end
-
-      Log.out Habit.directives(tablets).show
+      Habit.suggest tablets, words[0]
 
       true
     rescue Tabular::Error::Match
@@ -293,8 +287,18 @@ module Tabular(T)
       current
     end
 
-    protected def self.directives(tablets : Tablets)
-      tablets.reduce(Directive::None) { |acc, tablet| acc | tablet.directives }
+    protected def self.suggest(tablets : Tablets, word : String, prefix : String = "")
+      directives_ = Directive::None
+
+      tablets.each do |tablet|
+        tablet.candidate(word, prefix) do |suggestion|
+          # TODO: figure out an efficient way to get the directives
+          directives_ |= tablet.directives
+          Log.out suggestion
+        end
+      end
+
+      Log.out directives_.show
     end
 
     private macro with_habit(tablet)
