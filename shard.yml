@@ -1,11 +1,11 @@
 name: tabular
-version: 0.2.1
+version: 0.3.0
 
 authors:
   - Arian Johnson <i.am@ajohn.dev>
 
 homepage: https://leshaunj.github.io/tabular
-documentation: https://leshaunj.github.io/tabular
+documentation: https://leshaunj.github.io/tabular/latest/usage.html
 repository: https://github.com/leshaunj/tabular
 
 description: |-
@@ -17,5 +17,9 @@ development_dependencies:
   spectator:
     gitlab: arctic-fox/spectator
     version: ~> 0.12.0
+
+targets:
+  cli:
+    main: src/mock/cli.cr
 
 license: MIT
