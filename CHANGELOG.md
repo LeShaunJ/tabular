@@ -2,6 +2,18 @@
 
 ## 0.3.0
 
+- **chore**: configure tooling
+- **test**: use shell simulation
+- **ci**: ensure secure actions
+- **refactor**(spec): move spec CLI
+- **feat**(spec): shell simulation for specs
+- **fix**(habit,tablet): relay functionality
+- **refactor**(bash): bash completion function
+- **refactor**(habit): traversing function
+- **fix**(tablet): delimiter functionality
+- **fix**(habit,tablet): ensure `:no_file` on invalid command-line
+- **feat**(exceptions): simplify `Error::Match`
+- **style**: remove comments; fix typos
 - **docs**: add shell support
 - **fix**(fish): option bug
 - **fix**(habit,tablet): ensure delimited options are suggested
