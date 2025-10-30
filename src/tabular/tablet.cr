@@ -76,7 +76,7 @@ module Tabular(T)
       @aliases.each do |name|
         next unless name.starts_with?(word)
 
-        yield show("#{prefix}#{name}")
+        yield show(name)
       end
     end
 
@@ -92,7 +92,7 @@ module Tabular(T)
       return true if passthru? || @aliases.empty?
 
       @aliases.find_value(false) do |name|
-        delimited?(word, name) || name == word
+        delimited!(word, name) || name == word
       end
     end
 
@@ -133,6 +133,21 @@ module Tabular(T)
 
     private def skip?(word : String)
       word.empty? && kind.option?
+    end
+
+    private def delimited!(word : String, name : String)
+      return false unless delimited?(word, name)
+
+      full, arg = /^#{name}#{@delimiters}(.*)$/.match!(word)
+      raise Error::Match.new word if arg.empty?
+
+      is_match = @habit.tablets.all? { |tablet| tablet.match? arg }
+      raise Error::Match.new word unless is_match
+
+      @habit.tablets.clear
+      is_match
+    rescue ex : Regex::Error | IndexError
+      raise Error::Match.new word, ex
     end
 
     private def delimited?(word : String, name : String)
