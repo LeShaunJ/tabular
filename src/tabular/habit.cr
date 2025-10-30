@@ -195,7 +195,7 @@ module Tabular(T)
       self << Tablet.new kind, *args, **kwargs
     end
 
-    # Create a [`Command`][Tabular::Kind::Command] that yield completions for *words* back to the shell:
+    # Create a [`Command`][Tabular::Kind::Command] that yield completions for the remaining arguments back to the shell:
     #
     # ```
     # if Tabular.prompt?
@@ -293,7 +293,6 @@ module Tabular(T)
 
       tablets.each do |tablet|
         tablet.candidate(word, prefix) do |suggestion|
-          # TODO: figure out an efficient way to get the directives
           directives_ |= tablet.directives
           Log.out suggestion
         end

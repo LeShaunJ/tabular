@@ -48,7 +48,7 @@ module Tabular(T)
   # This is equivalent to:
   # ```
   # class MyClass
-  #   def my_completer(words : String) : Bool
+  #   def my_completer(words : Array(String) = ARGV) : Bool
   #     Tabular.form words do
   #       option "--help"
   #       command "sub_cmd1"
@@ -75,7 +75,7 @@ module Tabular(T)
   # This is equivalent to:
   # ```
   # class MyClass
-  #   def my_completer(words : String) : Bool
+  #   def my_completer(words : Array(String) = ARGV) : Bool
   #     Tabular.form words do
   #       relay
   #     end
@@ -96,7 +96,7 @@ module Tabular(T)
   # This is equivalent to:
   # ```
   # class MyClass
-  #   def my_installer(words : String) : Bool
+  #   def my_installer(words : Array(String) = ARGV) : Bool
   #     Tabular::Fragments.install words
   #   end
   # end

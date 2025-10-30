@@ -146,13 +146,10 @@ module Tabular(T)
     end
 
     private def passthru?
-      # TODO: swap???
-      # @passthru ||= (kind.argument? && (directives.filter_ext? || directives.filter_dir?)).as(Bool)
       @passthru ||= (directives.filter_ext? || directives.filter_dir?).as(Bool)
     end
 
     private def show(name : String = @name)
-      # "#{name}\t#{@help}".rstrip "\t" # TODO: decide...
       "#{(name.empty? ? @aliases.join('|') : name)}\t#{@help}".rstrip "\t"
     end
 
