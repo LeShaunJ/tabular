@@ -81,7 +81,7 @@ module Tabular(T)
 
     # Returns `self` if *word* is an exact match of any names. Otherwise, raise [`Error::Match`][Tabular::Error::Match].
     def match!(word : String)
-      raise Error::Match.new "No match for '#{word}'" unless match?(word)
+      raise Error::Match.new word unless match?(word)
 
       self
     end

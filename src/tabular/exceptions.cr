@@ -6,7 +6,13 @@ module Tabular(T)
     class Any < Exception; end
 
     # Raised when an argument that must [`Tablet`][Tabular::Tablet] does not.
-    class Match < Any; end
+    class Match < Any
+      def to_s(io : IO) : Nil
+        io << "No match for '"
+        io << message
+        io << "'"
+      end
+    end
 
     # Raised when method arguments are incorrect or missing.
     class Argument < Any; end
