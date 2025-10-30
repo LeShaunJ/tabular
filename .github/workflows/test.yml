@@ -50,6 +50,43 @@ jobs:
       - name: Download source
         uses: actions/checkout@v2
 
+      - name: Cache apt packages
+        if: runner.os == 'Linux'
+        uses: actions/cache@v4
+        with:
+          path: |
+            /var/cache/apt
+            /var/lib/apt/lists
+          key: ${{ runner.os }}-apt-${{ hashFiles('.github/workflows/**') }}
+          restore-keys: |
+            ${{ runner.os }}-apt-
+
+      - name: Cache Homebrew
+        if: runner.os == 'macOS'
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Caches/Homebrew
+          key: ${{ runner.os }}-brew-${{ hashFiles('.github/workflows/**') }}
+          restore-keys: |
+            ${{ runner.os }}-brew-
+
+      - name: Ensure bash, zsh, and fish are installed
+        run: |
+          set -e
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            sudo apt-get update -y
+            sudo apt-get install -y bash fish zsh bash-completion
+          elif [[ "$RUNNER_OS" == "macOS" ]]; then
+            brew update
+            brew install bash fish zsh bash-completion
+          fi
+
+      - name: Show shell versions
+        run: |
+          echo "Bash: $(bash --version | head -1)"
+          echo "Zsh:  $(zsh --version)"
+          echo "Fish: $(fish --version)"
+
       - name: Install Crystal
         uses: crystal-lang/install-crystal@v1
         with:
@@ -67,8 +104,10 @@ jobs:
 
       - name: Run tests
         run: >-
-          shards build &&
-          crystal spec -v --fail-fast --tag library --junit_output crtest.xml
+          mkdir -p bin &&
+          crystal build spec/mock/cli.cr -o bin/cli1 &&
+          ln -sf cli1 bin/cli2 &&
+          crystal spec -v --tag library --junit_output crtest.xml
 
       - name: Upload Test Results
         if: (!cancelled())
