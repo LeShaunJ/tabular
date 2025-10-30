@@ -6,7 +6,16 @@
 *.dwarf
 .venv
 .vscode
+.codacy
+*.sarif
+/test.*
+/.spectator-failures
+.DS_Store
 
 # Libraries don't need dependency lock
 # Dependencies will be locked in applications that use them
 /shard.lock
+
+
+#Ignore vscode AI rules
+.github/instructions/codacy.instructions.md
