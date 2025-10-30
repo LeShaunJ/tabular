@@ -1,0 +1,48 @@
+actions:
+  changelog:
+    command: git log $(git describe --tags --abbrev=0)..HEAD --pretty="tformat:- %B%- (%h)"
+    description: generate a changelog for your pull request
+  codacy:
+    command: >-
+      podman run
+      --rm
+      --privileged
+      --env CODACY_CODE="${PWD}"
+      --env CODACY_PROJECT_TOKEN="${CODACY_PROJECT_TOKEN}"
+      --env CODACY_API_TOKEN="${CODACY_API_TOKEN}"
+      --env CODACY_API_BASE_URL="${CODACY_API_BASE_URL}"
+      --volume "/var/run/docker.sock:/var/run/docker.sock"
+      --volume "${PWD}:${PWD}"
+      --volume /tmp:/tmp
+      codacy/codacy-analysis-cli:stable --
+    description: call the codacy scanner
+  release-notes:
+    command: >-
+      previous=$(git tag --sort=-creatordate | head -n 2 | tail -n 1);
+      latest=$(git describe --first-parent --abbrev=0 --match 'v[0-9]*.[0-9]*.[0-9]*');
+      git log "${previous}..${latest}" --pretty=$'tformat:### %B%-\n'
+      | perl -p0e ' s/\n\n### (.+)\n(?:(?=\n###)|$)/\n* $1/g; s/(?<=^\* )(\w+)/**$1**/gm;'
+    description: generate release notes
+  scan:
+    command: ops -q codacy --verbose --output results.sarif --format sarif --gh-code-scanning-compat
+    description: run a codacy scan and output SARIF results
+  tag:
+    command: |-
+      #!/usr/bin/env bash
+      set -x -e -o pipefail
+      fail() { >&2 echo "ERROR: ${*:2}"; exit $1; }
+      branch=$(git branch --show-current)
+      [[ "${branch}" == "main" ]] || fail 1 "must be main branch"
+      git fetch --tags --force
+      latest=$(git describe --first-parent --abbrev=0 --match 'v[0-9]*.[0-9]*.[0-9]*' | tr -d v)
+      proposed=$(crystal eval 'require "./src/tabular/version"; puts Tabular::VERSION')
+      [[ "${latest}" != "${proposed}" ]] || fail 2 "v${proposed} already latest"
+      greater="$(printf '%s\n' "${latest}\n${proposed}" | sort -V | head -1)"
+      [[ "${greater}" == "${proposed}" ]] || fail 3 "v${proposed} not above v${latest}"
+      git tag -s -f -a v${proposed} -m "version ${proposed}"
+      git push origin --tags --force
+    description: create a new tag
+    param_expansion: true
+options:
+  environment:
+    DOCKER_DEFAULT_PLATFORM: linux/amd64
