@@ -254,7 +254,9 @@ module Tabular(T)
       Habit.suggest tablets_, *current.to_prefix(words[0])
 
       true
-    rescue Tabular::Error::Match
+    rescue ex : Error::Match
+      Log::Error.show ex
+      Log.out Directive::NoFile.show
       false
     end
 
@@ -276,7 +278,7 @@ module Tabular(T)
         next if current.next { |name| current = Tablet::NONE if name.match!(word) }
 
         current = find(tablets, word)
-        next if current.kind.none?
+          raise Error::Match.new word if current.kind.none?
 
         tablets.delete current unless current.repeatable?
         next unless current.kind.runnable?
@@ -294,7 +296,7 @@ module Tabular(T)
       tablets.each do |tablet|
         tablet.candidate(word, prefix) do |suggestion|
           directives_ |= tablet.directives
-          Log.out suggestion
+          Log.out suggestion unless suggestion.empty?
         end
       end
 

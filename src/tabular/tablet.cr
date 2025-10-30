@@ -23,7 +23,7 @@ module Tabular(T)
   # Represents a parameter whose name and aliases may be suggested and matched during tab completion.
   struct Tablet
     # Basically, [`Tablet?`][Tabular::Tablet] minus the baggage.
-    NONE = Tablet.new(:none)
+    NONE = Tablet.new(:none, directives: :no_file)
 
     @kind : Kind
     @aliases : Set(String)
@@ -70,6 +70,7 @@ module Tabular(T)
     # Yield suggestions for any names that contain *word*.
     def candidate(word : String, prefix : String = "", & : String ->)
       return if skip?(word)
+      return yield "" if @aliases.empty? && always_suggest?
       return @aliases.each { |name| yield show(name) } if always_suggest?
 
       @aliases.each do |name|
