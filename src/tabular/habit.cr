@@ -272,21 +272,26 @@ module Tabular(T)
       current = Tablet::NONE
 
       while words.size > 1
-        word = words.shift
-        Tabular::Log::Debug.show "ARG: '#{word}' | LEFT: #{words}"
+        begin
+          word = words[0]
+          Log::Debug.show "WORDS: #{words} | WORD: #{word}"
 
-        next if current.next { |name| current = Tablet::NONE if name.match!(word) }
+          next if current.next { |name| current = Tablet::NONE if name.match!(word) }
 
-        current = find(tablets, word)
+          current = find(tablets, word)
           raise Error::Match.new word if current.kind.none?
 
-        tablets.delete current unless current.repeatable?
-        next unless current.kind.runnable?
+          tablets.delete current unless current.repeatable?
+          next unless current.kind.runnable?
+        ensure
+          words.shift
+        end
 
         yield current
         break
       end
 
+      Log::Debug.show "WORDS: #{words}"
       current
     end
 
