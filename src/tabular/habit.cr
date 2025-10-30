@@ -208,8 +208,8 @@ module Tabular(T)
     # Completions from the point of this [`Tablet`][Tabular::Tablet] are generated as if the
     # command-line started with the remaining [`#words`][Tabular::Habit#words]. This is useful
     # for `sudo`-like commands that expect a command prompt to run in a specific context.
-    def relay(words : Array(String) = @words)
-      tablet :none, "#{words.join("\n")}#{EOR}", directives: :relay
+    def relay
+      tablet :none, directives: :relay
     end
 
     # Yield control back to the CLI with *block* when a [`Command`][Tabular::Kind::Command] is matched:
@@ -271,6 +271,8 @@ module Tabular(T)
     protected def self.traverse(tablets : Tablets, words : Array(String), & : Tablet -> Bool) : Tablet
       current = Tablet::NONE
 
+      forward tablets, words
+
       while words.size > 1
         begin
           word = words[0]
@@ -293,6 +295,14 @@ module Tabular(T)
 
       Log::Debug.show "WORDS: #{words}"
       current
+    end
+
+    protected def self.forward(tablets : Tablets, words : Array(String))
+      if relay = tablets.find &.directives.relay?
+        Log::Debug.show "FORWARD: #{words}"
+        relay.aliases.add "#{words.join("\n")}#{EOR}"
+        words.clear << ""
+      end
     end
 
     protected def self.suggest(tablets : Tablets, word : String, prefix : String = "")

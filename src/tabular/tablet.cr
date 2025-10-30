@@ -42,6 +42,7 @@ module Tabular(T)
     # Additional directives the [`Tablet`][Tabular::Tablet] will send to the shell if suggested.
     getter :directives
 
+    protected setter :aliases
     protected getter :habit
     protected getter :delimiters
 
