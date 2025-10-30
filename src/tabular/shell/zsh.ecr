@@ -1,0 +1,59 @@
+# SEE: https://unix.stackexchange.com/questions/668618/how-to-write-automated-tests-for-zsh-completion/668827#668827
+autoload -U compinit
+compinit
+
+<% completers.each do |comp| -%>
+eval "$(<%= comp %> completion <%= bin %>)"
+<% end -%>
+
+compmock () {
+  export D_OPN=$'\C-B'
+  export D_CLS=$'\C-C'
+
+  <%= pty %> () {
+    zstyle ':completion:*' max-matches-width 10 # Ensure alt-names on separate rows
+    zstyle ':completion:*' list-colors '' # Disable colouring
+
+    # Bind a custom widget to TAB.
+    bindkey '^I' complete-word
+    zle -C {,,}complete-word
+    complete-word () {
+      unset 'compstate[vared]' # Disguise a "normal" command-line
+      compstate[insert]=menu # Ensure menu is always displayed
+      compadd -x "${D_OPN}" # Open delimiter
+      _main_complete "$@" # Run completion
+      # Intercept unambiguous match
+      if [ -n "$compstate[unambiguous]" ] && [ "$compstate[nmatches]" = '1' ]; then
+        result=${compstate[unambiguous]/#$BASH_REMATCH}
+        echo -e "${D_OPN}\n${result}\n${D_CLS}"
+      fi
+      compadd -J -last- -x "${D_CLS}" # close delimiter
+      exit
+    }
+
+    vared -c tmp # Start line editor
+  }
+
+  zmodload zsh/zpty  # Load the pseudo terminal module.
+	trap 'zpty -d' ABRT EXIT HUP INT QUIT TERM  # Delete the pty.
+
+	while read -r -t10 -A ARGS; do
+		zpty {,}<%= pty %>   # Create a new pty and run our function in it.
+		zpty -w -n <%= pty %> "$1 $ARGS[*]"$'\t'  # Simulate a command being typed and tabbed.
+
+		# Capture terminal output
+		PTY_LINES=()
+		while zpty -r <%= pty %> REPLY; do
+			[[ "${REPLY}" =~ "${D_CLS}" ]] && break
+			[[ "${REPLY}" =~ "${D_OPN}" ]] \
+				&& PTY_LINES=() \
+				|| PTY_LINES+=("${REPLY%%$'\n'}")
+		done
+
+		print -nrC1 -- "${PTY_LINES[@]}" | sed -r -e 's/\x1b\[[0-9;]*m?//g' -e 's/\r//g' -e 's/ *$//g'
+    print -n -- $'\C-@'
+    zpty -d <%= pty %>
+	done
+}
+
+compmock <%= prog %>

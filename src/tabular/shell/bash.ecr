@@ -1,0 +1,20 @@
+<% {% if flag?(:darwin) %} -%>
+init="/opt/homebrew/etc/profile.d/bash_completion.sh"
+<% {% end %} -%>
+<% {% if flag?(:linux) %} -%>
+init="/etc/profile.d/bash_completion.sh"
+<%- {% end %} -%>
+[[ -f "${init}" ]] && . "${init}"
+<% completers.each do |comp| -%>
+eval "$(<%= comp %> completion <%= bin %>)"
+<% end %>
+while IFS= read -r -e -t10 LINE; do
+	eval "export COMP_WORDS=('<%= prog %>' ${LINE})"
+	export COMP_LINE="${COMP_WORDS[*]}"
+	export COMP_POINT=${#COMP_LINE}
+	export COMP_CWORD=$((${#COMP_WORDS[@]}-1))
+
+	__start_<%= prog %>
+	printf '%s\n' "${COMPREPLY[@]}" | sort
+	printf '\0'
+done

@@ -1,4 +1,4 @@
-require "./tabular/*"
+require "./tabular/includes"
 
 # The `Tabular` library.
 module Tabular(T)

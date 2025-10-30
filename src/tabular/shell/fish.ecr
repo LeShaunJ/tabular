@@ -1,0 +1,7 @@
+<% completers.each do |comp| -%>
+<%= comp %> completion <%= bin %> | source
+<% end %>
+while read -l LINE < /dev/stdin
+	complete -C "<%= prog %> $LINE"
+	printf '\0'
+end
