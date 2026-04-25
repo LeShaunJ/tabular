@@ -13,8 +13,6 @@ on:
       - mkdocs.yml
       - LICENSE
   pull_request:
-    branches:
-      - main
 
 permissions:
   contents: read
