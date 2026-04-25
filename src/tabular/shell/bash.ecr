@@ -1,10 +1,15 @@
-<% {% if flag?(:darwin) %} -%>
-init="/opt/homebrew/etc/profile.d/bash_completion.sh"
-<% {% end %} -%>
-<% {% if flag?(:linux) %} -%>
-init="/etc/profile.d/bash_completion.sh"
-<%- {% end %} -%>
-[[ -f "${init}" ]] && . "${init}"
+for init in \
+	/opt/homebrew/etc/profile.d/bash_completion.sh \
+	/opt/homebrew/etc/bash_completion \
+	/usr/local/etc/profile.d/bash_completion.sh \
+	/usr/local/etc/bash_completion \
+	/usr/share/bash-completion/bash_completion \
+	/etc/bash_completion \
+	/etc/profile.d/bash_completion.sh; do
+	if [[ -f "${init}" ]]; then . "${init}"; break; fi
+done
+type _get_comp_words_by_ref >/dev/null 2>&1 \
+	|| { echo "tabular spec: bash-completion not loaded" >&2; exit 99; }
 <% completers.each do |comp| -%>
 eval "$(<%= comp %> completion <%= bin %>)"
 <% end %>
