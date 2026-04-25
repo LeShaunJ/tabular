@@ -1,0 +1,92 @@
+# SEE: https://unix.stackexchange.com/questions/668618/how-to-write-automated-tests-for-zsh-completion/668827#668827
+#
+# Background:
+#   The Stack Exchange recipe runs `vared -c tmp` inside `zpty {,}fn`, but on
+#   glibc-based zsh 5.9 builds (Ubuntu 24.04, Debian sid, recent Homebrew)
+#   that combination corrupts the heap and the pty emits `free(): invalid
+#   pointer` instead of any completions. Spawning a fresh interactive
+#   `zsh -fi -c 'source <file>'` inside the zpty gives ZLE its own session and
+#   sidesteps the crash. We also avoid an EXIT trap on the outer shell — zpty
+#   propagates inherited traps to the child, so an outer cleanup trap would
+#   delete the source file out from under the next iteration.
+#
+#   The inner shell prints a READY sentinel right before `vared` activates, so
+#   the outer shell waits for it before sending input. Without that handshake,
+#   macOS pty buffering races with `zpty -w` and the TAB lands before ZLE has
+#   bound it, hanging on `vared` forever.
+autoload -U compinit
+compinit -u
+
+<% completers.each do |comp| -%>
+eval "$(<%= comp %> completion <%= bin %>)"
+<% end %>
+
+# `mktemp -p` is GNU-only; BSD `mktemp` (macOS) treats `-p` as the prefix flag.
+# Use an explicit path under TMPDIR (or /tmp) instead, which both honor.
+INNER="${TMPDIR:-/tmp}/tabular_<%= pty %>.$$"
+: > "${INNER}" || exit 1
+{
+	print -r -- 'autoload -U compinit'
+	print -r -- 'compinit -u'
+<% completers.each do |comp| -%>
+	print -r -- 'eval "$(<%= comp %> completion <%= bin %>)"'
+<% end -%>
+	print -r -- 'D_OPN=$'\''\C-B'\'
+	print -r -- 'D_CLS=$'\''\C-C'\'
+	print -r -- 'D_RDY=$'\''\C-E'\'
+	print -r -- 'zstyle ":completion:*" max-matches-width 10'
+	print -r -- 'zstyle ":completion:*" list-colors ""'
+	print -r -- 'zle -C {,,}complete-word'
+	print -r -- 'complete-word () {'
+	print -r -- '  unset "compstate[vared]"'
+	print -r -- '  compstate[insert]=menu'
+	print -r -- '  compadd -x "${D_OPN}"'
+	print -r -- '  _main_complete "$@"'
+	print -r -- '  if [ -n "$compstate[unambiguous]" ] && [ "$compstate[nmatches]" = "1" ]; then'
+	print -r -- '    result=${compstate[unambiguous]/#$BASH_REMATCH}'
+	print -r -- '    echo -e "${D_OPN}\n${result}\n${D_CLS}"'
+	print -r -- '  fi'
+	print -r -- '  compadd -J -last- -x "${D_CLS}"'
+	print -r -- '  exit'
+	print -r -- '}'
+	print -r -- 'bindkey "^I" complete-word'
+	# Trailing newline is required: pty stdout is line-buffered, so a bare
+	# `\C-E` would sit in the inner shell's buffer and the outer would block.
+	print -r -- 'print -- "${D_RDY}"'
+	print -r -- 'vared -c tmp'
+} > "${INNER}"
+
+D_OPN=$'\C-B'
+D_CLS=$'\C-C'
+D_RDY=$'\C-E'
+
+zmodload zsh/zpty
+
+while read -r -t10 -A ARGS; do
+	zpty <%= pty %> "zsh -fi -c 'source ${INNER}'"
+
+	# Wait until the inner shell has bound TAB and is parked in `vared`.
+	while zpty -r <%= pty %> REPLY; do
+		[[ "${REPLY}" == *"${D_RDY}"* ]] && break
+	done
+
+	zpty -w -n <%= pty %> "<%= prog %> ${ARGS[*]}"$'\t'
+
+	PTY_LINES=()
+	while zpty -r <%= pty %> REPLY; do
+		[[ "${REPLY}" == *"${D_CLS}"* ]] && break
+		if [[ "${REPLY}" == *"${D_OPN}"* ]]; then
+			REPLY="${REPLY##*${D_OPN}}"
+			PTY_LINES=()
+		fi
+		PTY_LINES+=("${REPLY%%$'\n'}")
+	done
+
+	print -nrC1 -- "${PTY_LINES[@]}" \
+		| sed -r -e 's/\x1b\[[0-9;]*m?//g' -e 's/\r//g' -e 's/ *$//g' \
+		| sed '/^$/d'
+	print -n -- $'\C-@'
+	zpty -d <%= pty %>
+done
+
+rm -f "${INNER}"

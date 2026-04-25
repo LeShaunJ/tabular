@@ -18,8 +18,4 @@ development_dependencies:
     gitlab: arctic-fox/spectator
     version: ~> 0.12.0
 
-targets:
-  cli:
-    main: src/mock/cli.cr
-
 license: MIT

@@ -23,7 +23,7 @@ module Tabular(T)
   # Represents a parameter whose name and aliases may be suggested and matched during tab completion.
   struct Tablet
     # Basically, [`Tablet?`][Tabular::Tablet] minus the baggage.
-    NONE = Tablet.new(:none)
+    NONE = Tablet.new(:none, directives: :no_file)
 
     @kind : Kind
     @aliases : Set(String)
@@ -42,6 +42,7 @@ module Tabular(T)
     # Additional directives the [`Tablet`][Tabular::Tablet] will send to the shell if suggested.
     getter :directives
 
+    protected setter :aliases
     protected getter :habit
     protected getter :delimiters
 
@@ -70,18 +71,19 @@ module Tabular(T)
     # Yield suggestions for any names that contain *word*.
     def candidate(word : String, prefix : String = "", & : String ->)
       return if skip?(word)
+      return yield "" if @aliases.empty? && always_suggest?
       return @aliases.each { |name| yield show(name) } if always_suggest?
 
       @aliases.each do |name|
         next unless name.starts_with?(word)
 
-        yield show("#{prefix}#{name}")
+        yield show(name)
       end
     end
 
     # Returns `self` if *word* is an exact match of any names. Otherwise, raise [`Error::Match`][Tabular::Error::Match].
     def match!(word : String)
-      raise Error::Match.new "No match for '#{word}'" unless match?(word)
+      raise Error::Match.new word unless match?(word)
 
       self
     end
@@ -91,7 +93,7 @@ module Tabular(T)
       return true if passthru? || @aliases.empty?
 
       @aliases.find_value(false) do |name|
-        delimited?(word, name) || name == word
+        delimited!(word, name) || name == word
       end
     end
 
@@ -134,6 +136,21 @@ module Tabular(T)
       word.empty? && kind.option?
     end
 
+    private def delimited!(word : String, name : String)
+      return false unless delimited?(word, name)
+
+      full, arg = /^#{name}#{@delimiters}(.*)$/.match!(word)
+      raise Error::Match.new word if arg.empty?
+
+      is_match = @habit.tablets.all? { |tablet| tablet.match? arg }
+      raise Error::Match.new word unless is_match
+
+      @habit.tablets.clear
+      is_match
+    rescue ex : Regex::Error | IndexError
+      raise Error::Match.new word, ex
+    end
+
     private def delimited?(word : String, name : String)
       return false if @delimiters.empty?
       return false unless form?
@@ -146,13 +163,10 @@ module Tabular(T)
     end
 
     private def passthru?
-      # TODO: swap???
-      # @passthru ||= (kind.argument? && (directives.filter_ext? || directives.filter_dir?)).as(Bool)
       @passthru ||= (directives.filter_ext? || directives.filter_dir?).as(Bool)
     end
 
     private def show(name : String = @name)
-      # "#{name}\t#{@help}".rstrip "\t" # TODO: decide...
       "#{(name.empty? ? @aliases.join('|') : name)}\t#{@help}".rstrip "\t"
     end
 

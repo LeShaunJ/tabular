@@ -87,9 +87,9 @@ __<%= var_name %>_process_completion_results() {
 			fullFilter+="$filter|"
 		done
 
-		filteringCmd="_filedir $fullFilter"
-		__<%= var_name %>_debug "File filtering command: $filteringCmd"
-		$filteringCmd
+		filteringCmd=(_filedir "$fullFilter")
+		__<%= var_name %>_debug "File filtering command: ${filteringCmd[@]}"
+		"${filteringCmd[@]}"
 	elif (( directive & shellCompDirectiveFilterDirs )); then
 		local subdir
 		subdir=${completions[0]}

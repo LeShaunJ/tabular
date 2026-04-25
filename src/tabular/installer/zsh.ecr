@@ -81,13 +81,14 @@ _<%= var_name %>() {
 		__<%= var_name %>_debug "Relaying completion..."
 		args=("${(@f)${out%%$'<%= EOR %>'}}")
 		if [ ${#args[@]} -gt 1 ]; then
-			words=(_ "${args[@]}")
+			words=("" "${args[@]}")
+			CURRENT=${#words[@]}
 			_command
 		else
 			words=("${args[@]}")
 			_command_names
 		fi
-		return
+		return 0
 	fi
 
 	local activeHelpMarker="<%= ACTIVE_HELP_MARKER %>"

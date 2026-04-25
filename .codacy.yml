@@ -1,0 +1,17 @@
+---
+exclude_paths:
+  - '.codacy/**'
+  - '.venv/**'
+  - '.vscode/**'
+  - '*.md'
+  - '**.min.js'
+  - '**/tests/**'
+  - 'benchmarks/**/*'
+  - 'docs/**'
+  - 'lib/**'
+  - 'site/**'
+  - 'spec/**'
+languages:
+  crystal:
+    extensions:
+      - ".ecr"

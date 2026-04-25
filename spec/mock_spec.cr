@@ -1,42 +1,52 @@
 require "./spec_helper"
+require "../src/tabular/shell"
 
-Spectator.describe Tabular, :library, :cli do
-  def run(args : Array(String))
-    args = %w(__complete).concat(args)
-    proc = Process.new "bin/cli", args, output: PIPE
-    stdout = proc.output.gets_to_end
-    status = proc.wait
+BIN_PATH = Path["#{__DIR__}/../bin"].normalize.to_s
 
-    stdout
+Spectator.describe Tabular::Shell, :library, :cli do
+  def self.expressions
+    Tabular::Shell.values.cartesian_product([
+      {["-"], "match", [/--environment\b/, /--env\b/]},
+      {["--env"], "match", [/--environment\b/, /--env\b/]},
+      {["--enviro"], "eq", ["--environment\n"]},
+      {["--environment", ""], "match", [/\bdev\b/, /\bci\b/, /\bstaging\b/, /\bproduction\b/]},
+      {["--env="], "match", [/\bdev\b/, /\bci\b/, /\bstaging\b/, /\bproduction\b/]},
+      {["--env=d"], "match", [/\bdev$/]},
+      {["--env=c"], "match", [/\bci$/]},
+      {["--env=s"], "match", [/\bstaging$/]},
+      {["--env=p"], "match", [/\bproduction$/]},
+      {["-e", "dev", ""], "match", [/^a\s.+\napply\s.+\n/m,
+                                    /^completion\s.+\n/m,
+                                    /^d\s.+\ndestroy\s.+\n/m,
+                                    /^e\s.+\nexec\s.+\n/m,
+                                    /^r\s.+\nrun\s.+\n/m]},
+      {["apply", "--file", ""], "match", [/\.ya?ml\b/]},
+      {["apply", "--file="], "match", [/\.ya?ml\b/]},
+      {["completion", ""], "match", [/\bbash\b/, /\bfish\b/, /\bzsh\b/]},
+      {["destroy", "-N", ""], "match", [/\bbin\/?\b/, /\bspec\/?\b/, /\bsrc\/?\b/]},
+      {["destroy", "-N", "bin", ""], "match", [/\bbin\/?\b/, /\bspec\/?\b/, /\bsrc\/?\b/]},
+      {["exec", "sh"], "match", [/\bsh\b/]},
+      {["exec", "cli2", "-"], "match", [/--environment\b/, /--env\b/]},
+      {["run", "sh"], "match", [/\bsh\b/]},
+      {["run", "cli2", "-"], "match", [/--environment\b/, /--env\b/]},
+      {["crap"], "match", [/^$/]},
+      {["crap", ""], "match", [/^$/]},
+    ]).map do |shell, args|
+      {shell, *args}
+    end
   end
 
-  def self.command_lines
-    [
-      {["-"], "eq", "--environment\n--env\n-e\n:4\n"},
-      {["--env"], "eq", "--environment\n--env\n:4\n"},
-      {["--enviro"], "eq", "--environment\n:4\n"},
-      {["--environment", ""], "eq", "dev\nci\nstaging\nproduction\n:0\n"},
-      {["--env="], "eq", "--env=dev\n--env=ci\n--env=staging\n--env=production\n:0\n"},
-      {["--env=d"], "eq", "--env=dev\n:0\n"},
-      {["--env=c"], "eq", "--env=ci\n:0\n"},
-      {["--env=s"], "eq", "--env=staging\n:0\n"},
-      {["--env=p"], "eq", "--env=production\n:0\n"},
-      {["-e", "dev", ""], "match", /apply\t.+\na\t.+\nrun\t.+\nr\t.+\ndestroy\t.+\nd\t.+\n:4/},
-      {["apply", "--file", ""], "eq", "yaml\nyml\n:8\n"},
-      {["apply", "--file="], "eq", "yaml\nyml\n:8\n"},
-      {["apply", "--file=yaml"], "eq", "yaml\nyml\n:8\n"},
-      {["apply", "--file=yml"], "eq", "yaml\nyml\n:8\n"},
-      {["run", ""], "eq", "::\n:64\n"},
-    ]
-  end
+  sample expressions do |shell, args, operator, condition|
+    subject(comps) { shell.simulate args, "cli1", "cli2", paths: [BIN_PATH] }
 
-  sample command_lines do |args, matcher, result|
-    it "completes as expected" do
-      case matcher
-      when "eq"
-        expect(run(args)).to eq(result)
-      when "match"
-        expect(run(args)).to match(result)
+    it "completes as expected", shell.to_sym do
+      condition.each do |pattern|
+        case operator
+        when "eq"
+          expect(comps).to eq(pattern)
+        when "match"
+          expect(comps).to match(pattern)
+        end
       end
     end
   end

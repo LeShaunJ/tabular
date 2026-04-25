@@ -195,7 +195,7 @@ module Tabular(T)
       self << Tablet.new kind, *args, **kwargs
     end
 
-    # Create a [`Command`][Tabular::Kind::Command] that yield completions for *words* back to the shell:
+    # Create a [`Command`][Tabular::Kind::Command] that yield completions for the remaining arguments back to the shell:
     #
     # ```
     # if Tabular.prompt?
@@ -208,8 +208,8 @@ module Tabular(T)
     # Completions from the point of this [`Tablet`][Tabular::Tablet] are generated as if the
     # command-line started with the remaining [`#words`][Tabular::Habit#words]. This is useful
     # for `sudo`-like commands that expect a command prompt to run in a specific context.
-    def relay(words : Array(String) = @words)
-      tablet :none, "#{words.join("\n")}#{EOR}", directives: :relay
+    def relay
+      tablet :none, directives: :relay
     end
 
     # Yield control back to the CLI with *block* when a [`Command`][Tabular::Kind::Command] is matched:
@@ -254,7 +254,9 @@ module Tabular(T)
       Habit.suggest tablets_, *current.to_prefix(words[0])
 
       true
-    rescue Tabular::Error::Match
+    rescue ex : Error::Match
+      Log::Error.show ex
+      Log.out Directive::NoFile.show
       false
     end
 
@@ -269,23 +271,38 @@ module Tabular(T)
     protected def self.traverse(tablets : Tablets, words : Array(String), & : Tablet -> Bool) : Tablet
       current = Tablet::NONE
 
+      forward tablets, words
+
       while words.size > 1
-        word = words.shift
-        Tabular::Log::Debug.show "ARG: '#{word}' | LEFT: #{words}"
+        begin
+          word = words[0]
+          Log::Debug.show "WORDS: #{words} | WORD: #{word}"
 
-        next if current.next { |name| current = Tablet::NONE if name.match!(word) }
+          next if current.next { |name| current = Tablet::NONE if name.match!(word) }
 
-        current = find(tablets, word)
-        next if current.kind.none?
+          current = find(tablets, word)
+          raise Error::Match.new word if current.kind.none?
 
-        tablets.delete current unless current.repeatable?
-        next unless current.kind.runnable?
+          tablets.delete current unless current.repeatable?
+          next unless current.kind.runnable?
+        ensure
+          words.shift
+        end
 
         yield current
         break
       end
 
+      Log::Debug.show "WORDS: #{words}"
       current
+    end
+
+    protected def self.forward(tablets : Tablets, words : Array(String))
+      if relay = tablets.find &.directives.relay?
+        Log::Debug.show "FORWARD: #{words}"
+        relay.aliases.add "#{words.join("\n")}#{EOR}"
+        words.clear << ""
+      end
     end
 
     protected def self.suggest(tablets : Tablets, word : String, prefix : String = "")
@@ -293,9 +310,8 @@ module Tabular(T)
 
       tablets.each do |tablet|
         tablet.candidate(word, prefix) do |suggestion|
-          # TODO: figure out an efficient way to get the directives
           directives_ |= tablet.directives
-          Log.out suggestion
+          Log.out suggestion unless suggestion.empty?
         end
       end
 

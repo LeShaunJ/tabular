@@ -1,0 +1,16 @@
+<% completers.each do |comp| -%>
+<%= comp %> completion <%= bin %> | source
+<% end %>
+# fish 3.x's `read` builtin closes stdin after the first line when invoked
+# from a `-c` script with a piped stdin. The historical workaround was
+# `read -l LINE < /dev/stdin`, but on macOS BSD that opens a fresh fd via
+# /dev/fd/0 which EOFs on the second iteration and silently kills the loop.
+# `head -n 1` sidesteps the buffering quirk on both platforms; relying on
+# the simulator being synchronous (one line in / one response out) keeps
+# its read-ahead from eating subsequent lines.
+while true
+	set -l LINE (head -n 1)
+	test -z "$LINE"; and break
+	complete -C "<%= prog %> $LINE"
+	printf '\0'
+end
