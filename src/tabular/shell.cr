@@ -66,8 +66,13 @@ module Tabular(T)
         end
 
         buffer
-      rescue IO::Error
-        raise Exception.new stderr.gets_to_end
+      rescue err : IO::Error
+        # Surface anything the simulator wrote to stderr — and if it stayed
+        # silent, fall back to the original IO::Error so the failure isn't
+        # reported as a bare "Error:" with no detail.
+        diag = stderr.gets_to_end rescue ""
+        diag = "#{err.class}: #{err.message} (no stderr captured)" if diag.empty?
+        raise Exception.new "[#{self} simulator] #{diag}"
       end
     end
 
