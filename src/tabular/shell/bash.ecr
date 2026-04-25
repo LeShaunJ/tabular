@@ -1,3 +1,9 @@
+# History expansion turns the `!` in `_filedir`'s xspec into a syntax error and
+# leaves descriptions unformatted when `COLUMNS` is unset, so harden both up
+# front before any completion machinery is loaded.
+set +H
+export COLUMNS="${COLUMNS:-200}"
+
 <% {% if flag?(:darwin) %} -%>
 init="/opt/homebrew/etc/profile.d/bash_completion.sh"
 <% {% end %} -%>
@@ -5,6 +11,28 @@ init="/opt/homebrew/etc/profile.d/bash_completion.sh"
 init="/etc/profile.d/bash_completion.sh"
 <%- {% end %} -%>
 [[ -f "${init}" ]] && . "${init}"
+
+# Patch `_filedir` so an empty `cur` still expands extension filters. Stock
+# bash-completion routes empty cur through `_quote_readline_by_ref`, which
+# yields the literal `''` and then matches no files; real bash papers over
+# this with `complete -o default`, but the mock has no shell to fall back to.
+if declare -F _filedir >/dev/null 2>&1; then
+	eval "__tabular_orig_filedir() $(declare -f _filedir | tail -n +2)"
+	_filedir() {
+		if [[ -z ${cur-} && -n ${1-} && ${1-} != "-d" ]]; then
+			local __xspec="!*.@(${1}|${1^^})"
+			local __reset
+			__reset=$(shopt -po noglob)
+			set -o noglob
+			COMPREPLY+=( $(compgen -f -X "$__xspec" -o plusdirs -- "") )
+			$__reset
+			(( ${#COMPREPLY[@]} > 0 )) && compopt -o filenames 2>/dev/null
+			return 0
+		fi
+		__tabular_orig_filedir "$@"
+	}
+fi
+
 <% completers.each do |comp| -%>
 eval "$(<%= comp %> completion <%= bin %>)"
 <% end %>
